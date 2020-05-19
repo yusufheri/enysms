@@ -1,0 +1,106 @@
+{% extends 'dashboard/partials/base.html.twig' %}
+
+{% block title %}Mon profile::enysms{% endblock %}
+
+{% block stylesheets %}
+     {{ encore_entry_link_tags('css/dashboard') }}
+{% endblock %}
+
+{% block body %}
+    {% include "dashboard/partials/header.html.twig" %}  
+    <div class="container-fluid">
+        <div class="row">
+            {% include "dashboard/partials/menu.html.twig" %}
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">  
+                           
+                    <div class="container">
+                        {% for label, messages in app.flashes %}
+                            <div class="container">
+                                <div class="alert alert-dismissible alert-success">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    {% for message in messages %}
+                                        <p>{{ message | raw }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% set user = app.user %}
+                     <div class="row align-items-center mb-2 mt-2">
+                        <div class="col-md-3 text-center">
+                            <img src="/images/avatar.jpg" alt="Avatar de {{user.fullName}}" class="avatar mb-3">
+                            <br>
+                        </div>
+                        <div class="col-md-9 align-items-center">
+                            <h1>{{ user.fullName }} </h1>
+                            {% if user is same as (app.user) %}
+                                <div class="mt-3">
+                                    <a href="{{ path('account_profile') }}" class="btn btn-primary mr-2 mb-2">
+                                    <i class="fas fa-user-edit"></i> Modifier mes informations</a>
+                                    <a href="{{ path('account_update_password') }}" class="btn btn-danger mr-2 mb-2">
+                                    <i class="fas fa-edit"></i> Modifier mon mot de passe</a>
+                                </div>
+                            {% endif %}
+                            <p class="mb-0">{{ user.description | raw }}.</p>                          
+                        </div>                        
+                    </div>
+                     <hr>
+                     <h1 class="my-3"> Mes activités</h1>
+                        
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#favorites">
+                            <i class="fas fa-sms"></i>
+                            Messages favoris ({{ user.favorites|length | default('0') }})</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#contacts">
+                            <i class="fas fa-address-book"></i>
+                            Contacts enregistrés ({{ user.people|length | default('0') }})</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#groupes">
+                            <i class="fas fa-users"></i>
+                            Groupes ({{ user.groups|length | default('0') }})</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#senders">
+                            <i class="fas fa-share-square"></i>
+                            Senders ({{ user.senders|length | default('0') }})</a>
+                        </li>
+                    </ul>
+                    <div id="myTabContent" class="tab-content">                   
+                        <div class="tab-pane fade active show" id="favorites">
+                            <div class="container-fluid">
+                                <h1>Mes messages favoris</h1>
+                                {% include "dashboard/partials/_favorites.html.twig" with {"data" : user.favorites} %}
+                            </div>  
+                        </div>
+                        <div class="tab-pane fade" id="contacts">
+                            <div class="container-fluid">
+                                 <h1>Mes contacts</h1>
+                                {% include "dashboard/partials/_person.html.twig" with {"data" : user.people} %}
+                            </div>  
+                        </div>
+                        <div class="tab-pane fade" id="groupes">
+                            <div class="container-fluid">
+                                 <h1>Mes groupes</h1>
+                                {% include "dashboard/partials/_groupes.html.twig" with {"data" : user.groups} %}
+                            </div>  
+                        </div>
+                        <div class="tab-pane fade" id="senders">
+                            <div class="container-fluid">
+                                <h1 class="">Senders</h1>
+                                {% include "dashboard/partials/_senders.html.twig" with {"data" : user.senders} %}
+                            </div>  
+                        </div>
+                    </div>
+                 </div> 
+            </main>
+        </div>
+        
+    </div>
+    
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('js/dashboard') }}   
+{% endblock %} 

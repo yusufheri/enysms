@@ -1,0 +1,58 @@
+{% extends 'dashboard/partials/base.html.twig' %}
+
+{% block title %}Utilisateurs::enysms{% endblock %}
+
+{% block stylesheets %}
+     {{ encore_entry_link_tags('css/dashboard') }}
+{% endblock %}
+
+{% block body %}
+    {% include "dashboard/partials/header.html.twig" %}  
+    <div class="container-fluid">
+        <div class="row">
+            {% include "dashboard/partials/menu.html.twig" %}
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-2"> 
+                 <h1 class="my-3">Utilisateurs ({{ users|length }})</h1>
+                 
+                <div class="container-fluid">
+                    <a href="{{ path('dashboard_account_new') }}" class="btn btn-primary my-3">
+                    <i class="fas fa-plus"></i> Nouvel utilisateur</a><br>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Date</th>
+                                <th>Noms</th>
+                                <th>Email</th>
+                                <th  class="text-center">Role</th>
+                                <th width="13%" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set i = 0 %}
+                            {% for user in users %}
+                                <tr>
+                                    {% set i = i+1 %}
+                                    <td>{{i}}</td>                   
+                                    <td>{{user.createdAt | date('d-m-Y H:i')}}</td>
+                                    <td>{{user.fullName}}</td>
+                                    <td>{{user.email}}</td>
+                                    <td  class="text-center">{{user.roles|length}}</td>
+                                    <td class="text-center">
+                                        <a href="#" class="btn btn-primary"><i class="fas fa-eye"></i></a> 
+                                        <a href="#" class="btn btn-danger"><i class="fas fa-trash"></i></a> 
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>                    
+            </main>
+        </div>
+    </div>
+{% endblock %}
+ {% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+     {{ encore_entry_script_tags('js/dashboard') }}
+ {% endblock %}

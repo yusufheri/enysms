@@ -1,0 +1,34 @@
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>N°</th>
+            <th width="15%">Date</th>
+            <th>Noms</th>
+            <th>Téléphone</th>
+            <th>SMS</th>
+            <th width="13%" class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set i = 0 %}
+        {% for item in data %}
+            <tr>
+                {% set i = i+1 %}
+                <td>{{i}}</td>
+                <td>{{item.createdAt | date('d/m/Y H:i') }}</td>
+                <td><a href="#">
+                    <img src="/images/avatar.jpg" alt="Avatar de {{item.fullName}}" class="avatar avatar-mini">                                           
+                    {{item.fullName}}</a>
+                </td>                    
+                <td class="text-center">{{item.phoneMain ~ ' ' ~ item.phone}}</td>
+                <td >{{item.messages | length | default('0')}}</td>
+                <td class="text-center">
+                    <a href="#" class="btn btn-primary"><i class="fas fa-eye"></i></a> 
+                    {% if is_granted("ROLE_ADMIN") %}
+                    <a href="#" class="btn btn-danger"><i class="fas fa-trash"></i></a> 
+                    {% endif %}                   
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

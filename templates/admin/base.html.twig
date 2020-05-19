@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>EnySMS - {% block title %}Welcome!{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         {{ encore_entry_link_tags('css/app') }}        
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css"  crossorigin="anonymous">
+            
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% include "admin/partials/header.html.twig" %}       
+        {% block body %}{% endblock %}
+        {% include "admin/partials/footer.html.twig" %}
+        {{ encore_entry_script_tags('js/app') }}       
+        <!-- <script src="/js/select2.min.js"></script> -->
+        <script>
+           (function($){
+                $(document).ready(function(){
+                    var offset = $(".navbar").offset().top;
+                    $(document).scroll(function(){
+                        var scrollTop = $(document).scrollTop();
+                        if(scrollTop > offset){
+                            $(".navbar").css("position", "fixed");
+                            $(".navbar").css("width", "100%");
+                            $(".navbar").css("top", "0");
+                            $(".navbar").css("z-index", "1");
+                        }
+                        else {
+                            $(".navbar").css("position", "static");
+                        }
+                    });
+                });
+            })(jQuery);
+        </script>
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

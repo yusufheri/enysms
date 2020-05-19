@@ -1,0 +1,31 @@
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>N°</th>
+            <th width="15%">Date</th>
+            <th>Libellé</th>
+            <th>Description</th>
+            <th>Created By</th>
+            <th width="13%" class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set i = 0 %}
+        {% for item in data %}
+            <tr>
+                {% set i = i+1 %}
+                <td>{{i}}</td>
+                <td>{{item.createdAt | date('d/m/Y H:i') }}</td>
+                <td>{{item.title}}</td>                    
+                <td>{{item.description}}</td>
+                <td >{{item.user.fullName}}</td>
+                <td class="text-center">
+                    <a href="#" class="btn btn-primary"><i class="fas fa-eye"></i></a> 
+                    {% if is_granted("ROLE_ADMIN") %}
+                    <a href="#" class="btn btn-danger"><i class="fas fa-trash"></i></a> 
+                    {% endif %}                   
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

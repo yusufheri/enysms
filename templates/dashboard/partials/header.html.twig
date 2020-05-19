@@ -1,0 +1,41 @@
+<nav class="navbar navbar-dark fixed-top bg-primary flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-sm-3  col-md-2 mr-0" href="{{ path('homepage') }}">
+    <i class="fas fa-sms"></i>
+    enysms </a>    
+    {#  {{ render(controller('App\\Controller\\SearchController::searchMember')) }} #}
+    <ul class="navbar-nav ml-auto px-3">
+        {% if app.user  %}
+        {% set user = app.user %}
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" id="accountDropdownLink">
+                <img src="/images/avatar.jpg" alt="Avatar de {{user.fullName}}" class="avatar avatar-mini">         
+                {{user.fullName}}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" style="position: absolute;z-index: 2;" aria-labellebdy="accountDropdownLink">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="#" target="_blank" class="dropdown-item">Page d'administration</a>
+                            <div class="dropdown-divider"></div>
+                        {% endif %}
+                        <a href="{{ path('homepage') }}" class="dropdown-item"><i class="fas fa-home"></i> Page d'accueil</a>
+                        <a href="{{ path('dashboard_person_new') }}" class="dropdown-item">
+                            <i class="fas fa-user-plus"></i> Nouveau contact
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{path('account_index')}}" class="dropdown-item">
+                         <i class="fas fa-user-circle"></i> Mon compte
+                        </a>
+                        <a href="{{path('account_update_password')}}" class="dropdown-item">
+                            <i class="fas fa-key"></i> Modifier le mot de passe
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ path('dashboard_account_logout') }}" class="dropdown-item"><i class="fas fa-lock"></i> Déconnexion</a>
+                    </div>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                Connecté</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>

@@ -1,0 +1,68 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Gestion des Paiements{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    
+    <div class="row">
+        <div class="col-md-8"><h1 class="my-3">Gestion des Paiements</h1></div>
+        <div class="col-md-4">
+            <a href="{{ path('payment_new') }}" class="btn btn-info float-center my-3">
+             <h4><i class="fas fa-money-check-alt"></i> Nouveau paiment</h4></a>
+        </div>
+    </div>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Date enreg.</th>
+                <th>Date paiement</th>
+                <th>Clients</th>
+                <th class="text-right">Montant</th>
+                <th class="text-center">Bouquet SMS</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set i = 0 %} {% set total = 0 %}
+            {% for payment in payments %}
+                {% set total = total + payment.amount %}
+                <tr>
+                    {% set i = i+1 %}
+                    <td>{{i}}</td>
+                    <td>{{payment.createdAt | date('Y-m-d H:i')}}</td>
+                    <td>{{payment.paidAt | date('Y-m-d')}}</td>                    
+                    <td>
+                        <img src="/images/avatar.jpg" alt="Avatar de {{payment.customer.fullName}}" class="avatar avatar-micro">
+                        {{payment.customer.fullName}}
+                    </td>
+                    <td class="text-success  text-right"><b>{{payment.amount | number_format(2,',',' ') ~" "~ payment.currency.title }}</b></td>                 
+                    <td class="text-center">
+                        <span class="badge badge-primary rounded">{{payment.bouquet ~ " SMS"}}</span>                   
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-primary"><i class="fas fa-edit"></i></a>
+                        <a href="#" class="btn btn-danger"
+                        onclick="return confirm('Voulez-vous supprimer ce paiment ?');"><i class="fas fa-trash"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfooter>
+            <tr class="bg-primary">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-right h4">Total </td>
+                <td class="text-black-50  text-right h4">{{ total | number_format(2,',',' ') }} &dollar;</td>
+                <td></td>
+                <td></td>
+                
+            </tr>
+        </tfooter>
+    </table>
+    
+
+</div>
+{% endblock %}

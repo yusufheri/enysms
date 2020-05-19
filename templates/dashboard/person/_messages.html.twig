@@ -1,0 +1,42 @@
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>N°</th>
+            <th>Date</th>
+            <th>Groupe</th>
+            <th>Sender</th>
+            <th>Message</th>
+            <th width="15%" class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set i = 0 %}
+        {% for message in messages %}
+            <tr class="{% if color == 'danger' %} text-danger {% endif %}">
+                {% set favorite = message.favorite %}
+                {% set i = i+1 %}
+                <td>{{i}}</td>                   
+                <td>{{message.createdAt | date('d-m-Y H:i')}}</td>
+                <td>
+                    {% set groupes = favorite.groupes %}
+                    {% if groupes|length > 0 %}
+                        {% for groupe in groupes %}
+                            <span class="badge badge-primary" data-toggle="tooltip" data-placement="bottom" title="{{groupe.title}}" data-original-title="{{groupe.title}}">
+                            {{groupe.title | extractText(20)}}
+                            </span>                                                 
+                        {% endfor %}                  
+                    {% else %}
+                        <span class="badge badge-danger">{{"Single SMS"}}</span>  
+                    {% endif %}                    
+                </td>
+                <td>{{favorite.sender.title}}</td>
+                <td>{{favorite.content | extractText(40)}}</td>
+                <td class="text-center">
+                    {# <a href="#" class="btn btn-primary"><i class="fas fa-check"></i>  {{ favorite.successMessages }}</a> 
+                    <a href="#" class="btn btn-danger"><i class="fas fa-trash"></i>  {{ favorite.errorMessages }}</a> #} 
+                                    
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

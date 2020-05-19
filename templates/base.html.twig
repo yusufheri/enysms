@@ -2,11 +2,17 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>EnySMS - {% block title %}Welcome!{% endblock %}</title>
+        {{ encore_entry_link_tags('css/app') }}
+         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css"  crossorigin="anonymous">
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
+        {% include "partials/layout/header.html.twig" %}
         {% block body %}{% endblock %}
+        {% include "partials/layout/footer.html.twig" %}
         {% block javascripts %}{% endblock %}
+
     </body>
 </html>

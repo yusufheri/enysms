@@ -1,0 +1,152 @@
+{% extends 'dashboard/partials/base.html.twig' %}
+
+{% block title %}Dashboard::enysms{% endblock %}
+
+{% block stylesheets %}
+     {{ encore_entry_link_tags('css/dashboard') }}
+{% endblock %}
+
+{% block body %}
+    {% include "dashboard/partials/header.html.twig" %}    
+    <div class="container-fluid">
+        <div class="row">
+             {% include "dashboard/partials/menu.html.twig" %}
+
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Rapport général</h1>
+                </div>
+               
+                <div class="row my-3">
+                    
+                    <div class="col-md">
+                        <div class="card text-white bg-primary mb-3 text-center">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <i class="fas fa-inbox fa-5x"></i>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h4 class="card-title">{{ stats.totalSMS | number_format(0,"",".") }} Total Messages </h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="col-md">
+                        <div class="card text-white bg-success mb-3 text-center">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <i class="fas fa-comments fa-5x"></i>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h4 class="card-title">{{ stats.totalBalance| number_format(0,"",".") }} Balance </h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="col-md">
+                        <div class="card text-white bg-warning mb-3 text-center">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <i class="fas fa-sms fa-5x"></i>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h4 class="card-title"> {{ stats.totalUsed | number_format(0,"",".") }} SMS Utilisé(s)</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <hr> 
+                <div class="row my-3">  
+                    <h3 class="my-2">
+                    <i class="fas fa-chart-bar"></i> Rapport du mois en cours (<span class="text-danger"> {{ stats.currentMonth }}</span> ) </h3>                      
+                    <canvas id="myChart"></canvas>
+                </div>
+                 
+                {# <div class="row my-3">
+                    <div class="col-md">
+                        <h3 class="">
+                            <i class="fas fa-comments" style="color: green;"></i> SMS par Utilisateur</h3>
+                        <canvas id="chart-area"></canvas>
+                    </div>
+                    <div class="col-md">
+                        <h3 class="r">
+                            <i class="fas fa-chart-pie" style="color: red"></i> Status SMS</h3>
+                        <canvas id="chart-area"></canvas>
+                    </div>
+                </div> #}
+            </main>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %} 
+    <script>
+        /* globals Chart:false, feather:false */
+        var color = Chart.helpers.color;
+		var barChartData = {
+			labels: [
+                {% for data in stats.currentMonthlyTitle %}
+                    "{{ data | date('Y-m-d') }}",
+                {% endfor %}
+            ],
+			datasets: [ {
+				label: 'SMS envoyé avec succès ',
+				backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+				borderColor: window.chartColors.blue,
+				borderWidth: 1,
+				data: [
+                    {% for data in stats.currentSuccess %}
+                        "{{ data }}",
+                    {% endfor %}
+				]
+            },
+            {
+				label: 'SMS non-envoyé ',
+				backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+				borderColor: window.chartColors.red,
+				borderWidth: 1,
+				data: [
+					{% for data in stats.currentError %}
+                        "{{ data }}",
+                    {% endfor %}
+				]
+			}]
+
+		};
+        (function () {
+            'use strict'  
+            
+            feather.replace()
+
+            // Graphs
+            var ctx = document.getElementById('myChart')
+            // eslint-disable-next-line no-unused-vars
+            var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: barChartData,
+            options: {
+					responsive: true,
+					legend: {
+						position: 'top',
+					},
+					title: {
+						display: false,
+						text: 'Chart.js Bar Chart'
+                    }
+				}
+            });
+
+            }())
+    
+    </script>
+ {% endblock %}

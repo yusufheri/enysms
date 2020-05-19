@@ -1,0 +1,79 @@
+{% extends 'dashboard/partials/base.html.twig' %}
+
+{% block title %}Nouveau contact::enysms{% endblock %}
+
+{% block stylesheets %}
+     {{ encore_entry_link_tags('css/dashboard') }}
+{% endblock %}
+
+{% block body %}
+    {% include "dashboard/partials/header.html.twig" %}  
+    <div class="container-fluid">
+        <div class="row">
+            {% include "dashboard/partials/menu.html.twig" %}
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">  
+                                      
+                    <div class="container">
+                        {% for label, messages in app.flashes %}
+                            <div class="container">
+                                <div class="alert alert-dismissible alert-primary">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    {% for message in messages %}
+                                        <p>{{ message | raw }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="row-md px-5">
+                             <h1 class="my-3">Modification du contact : {{ person.fullName }} </h1><hr>
+                            <div class="alert alert-light">                               
+                               
+                                {{ form_start(form) }}                            
+                                <div class="row">
+                                    <div class="col-md">{{ form_row(form.name) }}</div>
+                                    <div class="col-md">{{ form_row(form.lastname) }}</div>
+                                    <div class="col-md">{{ form_row(form.surname) }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md">{{ form_row(form.groupes) }}</div>
+                                    <div class="col-md">{{ form_row(form.phoneMain) }}</div>
+                                    <div class="col-md">{{ form_row(form.phone) }}</div>
+                                </div>
+                                {{ form_widget(form) }}
+                                         
+                                    
+                                <div class="alert alert-primary clearfix my-5">
+                                    <h2 class="alert-heading">Sauvegarder les informations</h2>
+                                    <p>Vous êtes sur le point d'apporter les modifications sur le contact {{ person.fullName }}.</p>
+                                    <button type="submit" class="btn btn-success float-right">
+                                        <i class="fas fa-check"></i>
+                                        Enregistrer les modifications
+                                    </button>
+                                </div>
+                                {{ form_end(form) }}
+                            </div>                            
+                        </div>
+                    </div> 
+            </main>
+        </div>
+        
+    </div>
+    
+{% endblock %}
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+    {{ encore_entry_script_tags('js/dashboard') }}   
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                
+                reader.onload = function (e) {
+                    $('#avatar').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }  
+    </script>
+{% endblock %} 

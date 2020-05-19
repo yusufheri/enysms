@@ -1,0 +1,168 @@
+{% extends 'dashboard/partials/base.html.twig' %}
+
+{% block title %}Dashboard::enysms{% endblock %}
+
+{% block stylesheets %}
+     {{ encore_entry_link_tags('css/dashboard') }}
+{% endblock %}
+
+{% block body %}
+    {% include "dashboard/partials/header.html.twig" %}    
+    <div class="container-fluid">
+        <div class="row">
+             {% include "dashboard/partials/menu.html.twig" %}
+
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Tableau de bord</h1>
+                </div>
+               
+                <div class="row my-3">
+                    
+                    <div class="col-md">
+                        <div class="card text-white bg-primary mb-3 text-center">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <i class="fas fa-inbox fa-5x"></i>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h4 class="card-title">{{report.totalBalance | number_format(0,"",".")}} Balance </h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="col-md">
+                        <div class="card text-white bg-success mb-3 text-center">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <i class="fas fa-sms fa-5x"></i>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h4 class="card-title">{{report.totalSentDaily | number_format(0,"",".")}} SMS Envoyés Aujourd'hui </h4>
+                                        {#  <p>{{stats.totalSent}}  SMS Envoyés </p> #}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="col-md">
+                        <div class="card text-white bg-warning mb-3 text-center">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <i class="fas fa-address-book fa-5x"></i>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h4 class="card-title">{{report.totalContacts | number_format(0,"",".")}} Contacts</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <hr> 
+                <div class="row my-3">  
+                      
+                    <div class="col-md-6">  
+                        <h3>Situation hebdomadaire (SMS)</h3>                      
+                        <canvas id="myChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="text-center">Status SMS journalier</h3>
+                        <canvas id="chart-area"></canvas>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}   
+    <script>
+        
+
+        var config = {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [
+                        {{report.groupStatusSMSSuccess }},
+                        {{report.groupStatusSMSError }}
+                    ],
+                    backgroundColor: [
+                       
+                        window.chartColors.blue,
+                         window.chartColors.red
+                    ],
+                    label: 'Dataset 1'
+                }],
+                labels: [
+                    "Success",
+                    "Error"
+                ]
+            },
+            options: {
+                responsive: true
+            }
+        };
+
+        window.onload = function() {
+            var ctx = document.getElementById('chart-area').getContext('2d');
+            window.myPie = new Chart(ctx, config);
+        };       
+    </script>
+    <script>
+        /* globals Chart:false, feather:false */
+
+        (function () {
+            'use strict'  
+            
+            feather.replace()
+
+            // Graphs
+            var ctx = document.getElementById('myChart')
+            // eslint-disable-next-line no-unused-vars
+            var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [
+                    {% for data in report.currentWeek %}
+                        "{{ data.day | date('Y-m-d') }}",
+                    {% endfor %}
+                ],
+                datasets: [{
+                data: [
+                    {% for data in report.currentWeek %}
+                        "{{ data.note }}",
+                    {% endfor %}
+                ],
+                lineTension: 0,
+                backgroundColor: 'transparent',
+                borderColor: '#007bff',
+                borderWidth: 4,
+                pointBackgroundColor: '#007bff'
+                }]
+            },
+            options: {
+                scales: {
+                yAxes: [{
+                    ticks: {
+                    beginAtZero: false
+                    }
+                }]
+                },
+                legend: {
+                display: false
+                }
+            }
+            })
+            }())
+    
+    </script>
+ {% endblock %}

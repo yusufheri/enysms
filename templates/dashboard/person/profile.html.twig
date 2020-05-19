@@ -1,0 +1,85 @@
+{% extends 'dashboard/partials/base.html.twig' %}
+
+{% block title %}Mon profile::enysms{% endblock %}
+
+{% block stylesheets %}
+     {{ encore_entry_link_tags('css/dashboard') }}
+{% endblock %}
+
+{% block body %}
+    {% include "dashboard/partials/header.html.twig" %}  
+    <div class="container-fluid">
+        <div class="row">
+            {% include "dashboard/partials/menu.html.twig" %}
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">  
+                           
+                    <div class="container">
+                        {% for label, messages in app.flashes %}
+                            <div class="container">
+                                <div class="alert alert-dismissible alert-success">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    {% for message in messages %}
+                                        <p>{{ message | raw }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    
+                     <div class="row align-items-center mb-2 mt-2">
+                        <div class="col-md-3 text-center">
+                            <img src="/images/avatar.jpg" alt="Avatar de {{person.fullName}}" class="avatar mb-3">
+                            <br>
+                        </div>
+                        <div class="col-md-9 align-items-center">
+                            <h1>{{ person.fullName }} </h1>
+                            <div class="mt-3">
+                                <a href="{{ path('dashboard_person_edit', {'id': person.id}) }}" class="btn btn-primary mr-2 mb-2">
+                                <i class="fas fa-user-edit"></i> Modifier les informations</a>
+                                <a href="{{ path('dashboard_person_delete', {'id': person.id}) }}" onclick="confirm('Voulez-vous désactiver ce contact de votre répertoire ?')" class="btn btn-danger mr-2 mb-2">
+                                <i class="fas fa-edit"></i> Désactiver ce contact</a>
+                            </div>
+                            <p class="mb-0">
+                                {% if person %}
+                                    {{ person.description | length > 0 ? person.description|raw : "Aucun commentaire"  }}.
+                                {% endif %}
+                            </p>                          
+                        </div>                        
+                    </div>
+                     <hr>
+                     <h1 class="my-3"> Rapport SMS</h1>
+                     <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#success">
+                            <i class="fas fa-sms"></i>
+                            Messages envoyés avec succès ({{ person.messagesSuccess| length | default('0') }})</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Messages non-envoyés ({{ person.messagesError| length | default('0') }})</a>
+                        </li>
+                    </ul>
+                    <div id="myTabContent" class="tab-content">                   
+                        <div class="tab-pane fade active show" id="success">
+                            <div class="container-fluid">
+                                <h1>Messages Success</h1>
+                                {% include "dashboard/person/_messages.html.twig" with {"messages" : person.messagesSuccess, "color" : "light"} %}
+                            </div>  
+                        </div>
+                        <div class="tab-pane fade" id="error">
+                            <div class="container-fluid">
+                                 <h1>Messages Error</h1>
+                                {% include "dashboard/person/_messages.html.twig" with {"messages" : person.messagesError, "color" : "danger"} %}
+                            </div>  
+                        </div>
+                    </div>
+                 </div> 
+            </main>
+        </div>
+        
+    </div>
+    
+{% endblock %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('js/dashboard') }}   
+{% endblock %} 

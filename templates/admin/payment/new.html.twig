@@ -1,0 +1,48 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouveau paiement{% endblock %}
+
+{% block body %}
+<div class="container">    
+        {% for label, messages in app.flashes %}
+            <div class="container my-5">
+                <div class="alert alert-dismissible alert-primary">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {% for message in messages %}
+                        <p>{{ message | raw }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    <div class="row">        
+        <div class="col-md-2">&nbsp;</div>
+        <div class="col-md alert alert-light">
+             <h1 class="alert-heading my-5">Nouveau paiement</h1>
+            {{ form_start(form) }}
+            <div class="row">
+                <div class="col-md"> {{ form_row(form.paidAt) }}</div>
+                <div class="col-md"> {{ form_row(form.customer) }}</div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2"> {{ form_row(form.currency) }}</div>
+                <div class="col-md-6"> {{ form_row(form.amount) }}</div>
+                <div class="col-md-4"> {{ form_row(form.bouquet) }}</div>
+            </div>
+            
+            {{ form_widget(form) }}
+                <div class="alert alert-primary clearfix my-5">
+                <h2 class="alert-heading">Sauvegarder les informations</h2>
+                <p>Vous êtes sur le point d'enregistrer un nouveau paiment dans la base de données.</p>
+                <button type="submit" class="btn btn-danger float-right">
+                    <i class="fas fa-check"></i>
+                    Enregistrer les informations
+                </button>
+            </div>
+            {{ form_end(form) }}
+        </div>   
+        <div class="col-md-2">&nbsp;</div>             
+    </div>
+
+</div>
+{% endblock %}

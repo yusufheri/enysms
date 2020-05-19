@@ -1,0 +1,89 @@
+  <nav class="col-md-2 d-none d-md-block bg-light sidebar"> 
+    <div class="sidebar-sticky">
+        {% set route_name = app.request.attributes.get('_route') %}       
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_index' %} active {% endif %}" href="{{ path('dashboard_index') }}">
+                <i class="fas fa-home fa-2x"></i>
+                Dashboard  
+                </a>
+            </li>
+            
+            
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_bulk_index' or 'dashboard_bulk' in route_name %} active {% endif %}" 
+                href="{{ path('dashboard_bulk_index') }}">
+                <i class="fas fa-comment-dots fa-2x"></i>
+                Bulk SMS
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_single' or 'dashboard_single' in route_name %} active {% endif %}"
+                href="{{ path('dashboard_single') }}">
+                <i class="fas fa-sms fa-2x"></i>
+                Single SMS
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_person' or 'dashboard_person' in route_name %} active {% endif %}" 
+                href="{{ path('dashboard_person_index') }}">
+                <div class="i fas fa-users fa-2x"></div>
+                Contacts
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_favorite' or 'dashboard_favorite' in route_name %} active {% endif %}" 
+                href="{{ path('dashboard_favorite_index') }}">
+                <i class="fas fa-comments fa-2x"></i>
+                Favoris
+                </a>
+            </li> 
+
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_sms_report' or 'dashboard_sms_report' in route_name %} active {% endif %}" 
+                href="{{ path('dashboard_sms_report') }}">
+                <i class="fas fa-chart-bar fa-2x"></i> Rapport
+                </a>
+            </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Paramètres</span>
+        <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+        </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_group_index' %} active {% endif %}" 
+                href="{{ path('dashboard_group_index') }}">
+                <span data-feather="file-text"></span>
+                Groupes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_sender_index' %} active {% endif %}" 
+                href="{{ path('dashboard_sender_index') }}">
+                <span data-feather="file-text"></span>
+                Sender
+                </a>
+            </li>
+        </ul> 
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Mon compte</span>
+        <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+        </a>
+        </h6>
+        <ul class="nav flex-column mb-25 ">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('homepage') }}">
+                <span data-feather="file-text"></span>
+                Déconnexion
+                </a>
+            </li>
+        </ul>       
+    </div>
+</nav>
