@@ -43,8 +43,17 @@ class SMSController extends AbstractController
      * @param EntityManagerInterface $manager
      * @return Response
      */
-    public function singleSMS(Request $request, EntityManagerInterface $manager){
+    public function singleSMS(Request $request, EntityManagerInterface $manager, PersonRepository $personRepository){
+
+        $id = $request->get('id');
+        
+        //dump($id);
+
         $single = new Favorite();
+        if(!is_null($id)){
+            $person = $personRepository->find($id);
+            $single->setPhone($person);
+        }
 
         $user = $this->getUser();
 

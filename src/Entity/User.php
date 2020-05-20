@@ -133,6 +133,16 @@ class User implements UserInterface
      */
     private $enabled;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="users")
+     */
+    private $owner;
+
+    /**
+     * @ORM\OneToMany(targetEntity=User::class, mappedBy="owner")
+     */
+    private $users;
+
     public function __construct()
     {
         $this->balances = new ArrayCollection();
@@ -144,6 +154,7 @@ class User implements UserInterface
         $this->people = new ArrayCollection();
         $this->payments = new ArrayCollection();
         $this->userPayments = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getFullName(){
@@ -560,6 +571,49 @@ class User implements UserInterface
     public function setEnabled(?bool $enabled): self
     {
         $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function getOwner(): ?self
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?self $owner): self
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(self $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(self $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            // set the owning side to null (unless already changed)
+            if ($user->getOwner() === $this) {
+                $user->setOwner(null);
+            }
+        }
 
         return $this;
     }

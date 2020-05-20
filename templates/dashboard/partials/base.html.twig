@@ -17,7 +17,71 @@
         {{ encore_entry_script_tags('js/app') }}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script> 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.12/js/select2.full.min.js"></script>       
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.12/js/select2.full.min.js"></script> 
+        <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
+        <script>
+            $(document).ready(function(){
+       
+                var people = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+            
+                    remote: {
+                        url: "{{ path('handle_request') }}/%QUERY%",
+                        wildcard: '%QUERY%',
+                        filter: function(people){
+                            return $.map(people, function(person)
+                            {
+                                return {
+                                    person_name: person.name,
+                                    person_lastname: person.lastname,
+                                    person_surname: person.surname,
+                                    person_id: person.id,
+                                    person_phone: person.phoneMain
+                                }
+                    
+                            })
+                    
+                        }
+                    }
+                })
+      
+                people.initialize();
+
+                $("#form_query").typeahead(
+                    {
+                        hint: true
+                    },
+                    {
+                        name: 'people',
+                        source: people.ttAdapter(),
+                        display: 'person_name',
+                        templates: {
+                            empty: [
+                                    '<div class="empty-message">Aucun contact trouvé avec ce mot clé </div>'
+                                    ].join('\n'),
+                            suggestion: function(data){ 
+                                var image = ' <img src="/images/avatar.jpg" alt="" class="avatar avatar-mini">';                        
+                                return `
+                                    <div class="row">
+                                        <a href='/dashboard/person/`+ data.person_id +`/profile'>
+                                            `+ image +`
+                                            <span>`+ data.person_name + ` ` + data.person_lastname +` (` + data.person_phone + `) </span>
+                                        </a>                                
+                                    </div>                                   
+                                `;
+                            },
+                            footer: function(query){
+                                return `<hr>                                
+                                 <span>&nbsp;</span>
+                                 <i class="fas fa-search"></i> 
+                                <span> Résultats avec le mot clé: <b>`+ query.query +`</b></span>`;
+                            }
+                        }
+                    }
+                )      
+            })
+        </script>      
         {{ encore_entry_script_tags('js/utils') }}
         <script>
             $('select').select2();

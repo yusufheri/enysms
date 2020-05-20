@@ -25,8 +25,10 @@ class AccountController extends AbstractController
      */
     public function index(UserRepository $userRepository)
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Sorry, you tried to access a page without having ROLE_ADMIN');    
+    
         return $this->render('dashboard/account/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'users' => $userRepository->findBy(["owner" => $this->getUser()], ["firstname" => "ASC"]),
         ]);
     }
 
@@ -66,6 +68,8 @@ class AccountController extends AbstractController
      * @return Response
      */
     public function new(Request $request, EntityManagerInterface $manager, UserPasswordEncoderInterface $encoder){
+        
+        $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Sorry, you tried to access a page without having ROLE_ADMIN');
 
         $user = new User();
         $form = $this->createForm(AccountType::class, $user);
@@ -76,6 +80,7 @@ class AccountController extends AbstractController
 
             $hash = $encoder->encodePassword($user, $user->getHash());
             $user->setHash($hash);
+            $user->setOwner($this->getUser());
 
             $manager->persist($user);
             $manager->flush();

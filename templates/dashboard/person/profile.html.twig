@@ -35,7 +35,9 @@
                             <div class="mt-3">
                                 <a href="{{ path('dashboard_person_edit', {'id': person.id}) }}" class="btn btn-primary mr-2 mb-2">
                                 <i class="fas fa-user-edit"></i> Modifier les informations</a>
-                                <a href="{{ path('dashboard_person_delete', {'id': person.id}) }}" onclick="confirm('Voulez-vous désactiver ce contact de votre répertoire ?')" class="btn btn-danger mr-2 mb-2">
+                                <a href="{{ path('dashboard_single', {'id': person.id}) }}"  class="btn btn-warning mr-2 mb-2">
+                                <i class="fas fa-sms"></i> Envoyez un SMS</a>
+                                 <a href="{{ path('dashboard_person_delete', {'id': person.id}) }}" onclick="confirm('Voulez-vous désactiver ce contact de votre répertoire ?')" class="btn btn-danger mr-2 mb-2">
                                 <i class="fas fa-edit"></i> Désactiver ce contact</a>
                             </div>
                             <p class="mb-0">

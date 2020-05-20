@@ -1,8 +1,8 @@
 <nav class="navbar navbar-dark fixed-top bg-primary flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-sm-3  col-md-2 mr-0" href="{{ path('homepage') }}">
     <i class="fas fa-sms"></i>
-    enysms </a>    
-    {#  {{ render(controller('App\\Controller\\SearchController::searchMember')) }} #}
+    enysms </a> 
+    {{ render(controller('App\\Controller\\Search\\PersonController::searchPerson')) }}
     <ul class="navbar-nav ml-auto px-3">
         {% if app.user  %}
         {% set user = app.user %}
@@ -13,7 +13,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" style="position: absolute;z-index: 2;" aria-labellebdy="accountDropdownLink">
                         {% if is_granted('ROLE_ADMIN') %}
-                            <a href="#" target="_blank" class="dropdown-item">Page d'administration</a>
+                            <a href="{{ path('admin_dashboard') }}" target="_blank" class="dropdown-item">Page d'administration</a>
                             <div class="dropdown-divider"></div>
                         {% endif %}
                         <a href="{{ path('homepage') }}" class="dropdown-item"><i class="fas fa-home"></i> Page d'accueil</a>
@@ -21,6 +21,11 @@
                             <i class="fas fa-user-plus"></i> Nouveau contact
                         </a>
                         <div class="dropdown-divider"></div>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('dashboard_account_list') }}"  class="dropdown-item">Comptes secondaires</a>
+                            <a href="{{ path('dashboard_account_new') }}"  class="dropdown-item">Créer un compte secondaire</a>
+                            <div class="dropdown-divider"></div>
+                        {% endif %}
                         <a href="{{path('account_index')}}" class="dropdown-item">
                          <i class="fas fa-user-circle"></i> Mon compte
                         </a>
