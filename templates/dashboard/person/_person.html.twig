@@ -18,7 +18,7 @@
                    <img src="/images/avatar.jpg" alt="Avatar de {{member.name}}" class="avatar avatar-mini">                                      
                     {{member.name ~' '~ member.lastname ~' '~ member.surname }}</a>
                 </td>                    
-                <td class="text-center">{{member.phoneMain}}</td>
+                <td class="text-center">{{member.phoneMain}} - {{ member.phone }}</td>
                 <td >
                     {% for item in member.groupes %}
                         <span class="span badge badge-primary" data-toggle="tooltip" data-placement="bottom" title="{{item.title}}" data-original-title="{{item.title}}">{{ item.title }}</span>

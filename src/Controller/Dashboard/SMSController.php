@@ -242,6 +242,23 @@ class SMSController extends AbstractController
                             ->setStatus($status);
         
                     $manager->persist($message);
+
+                    if(!is_null($person->getPhone())){
+                        $counter ++;
+                        $status =  $this->send_easy_sms($person->getPhone(),$bulk->getSender()->getTitle(),$bulk->getContent());
+                        
+                        if(strpos($status, "OK:") > -1) {
+                            $success ++; $state = 1;
+                        } else {$status = null;$state = null;}
+
+                        $message = new Message();
+                        $message->setFavorite($bulk)
+                                ->setPerson($person)
+                                ->setState($state)
+                                ->setStatus($status);
+            
+                        $manager->persist($message);
+                    }
                 }              
             }
             //}
@@ -261,6 +278,10 @@ class SMSController extends AbstractController
     }
 
     function send_easy_sms($to, $from, $message, $type=1){
+        $to = str_replace(" ","",$to);
+
+        if(strlen($to)==9) $to = "243".$to;
+
         $username = "yusuyher2020";
         $password = "esm38240";
         $url = "https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=$username&password=$password&from=$from&to=$to&text=".urlencode($message)."&type=$type";
