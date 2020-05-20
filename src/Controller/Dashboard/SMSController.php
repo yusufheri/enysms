@@ -2,18 +2,24 @@
 
 namespace App\Controller\Dashboard;
 
-use App\Entity\Favorite;
-use App\Entity\Message;
+use App\Entity\Group;
 use App\Entity\Person;
+use App\Entity\Sender;
 use App\Form\BulkType;
-use App\Form\SingleSMSType;
-use App\Repository\PersonRepository;
-use App\Service\ReportCustomer;
 use App\Service\Stats;
+use App\Entity\Message;
+use App\Entity\Favorite;
+use App\Form\SingleSMSType;
+use App\Service\ReportCustomer;
+use App\Repository\GroupRepository;
+use App\Repository\PersonRepository;
+use App\Repository\SenderRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SMSController extends AbstractController
 {
@@ -57,7 +63,49 @@ class SMSController extends AbstractController
 
         $user = $this->getUser();
 
-        $form = $this->createForm(SingleSMSType::class, $single);
+        //$form = $this->createForm(SingleSMSType::class, $single);
+
+        $form = $this   ->createFormBuilder($single)
+                        ->add('phone', EntityType::class,[
+                            'label' => "Personne ",
+                            'attr'  => [
+                                'placeholder' => "Selectionnez la personne",
+                            ],
+                            'class' => Person::class,
+                            'query_builder' => function(PersonRepository $personRepository){
+                                return $personRepository->createQueryBuilder('p')
+                                            ->where("p.deletedAt IS NULL")
+                                            ->andWhere("p.user = :user")
+                                            ->orderBy("p.name", "ASC")
+                                            ->setParameter("user", $this->getUser());
+                            },
+                            'choice_label' => function($person){
+                                return $person->getFullNames();
+                            }
+                        ])
+                        ->add('sender', EntityType::class,[
+                            'label' => "Sender ",
+                            'attr'  => [
+                                'placeholder' => "Selectionnez le Sender",
+                            ],
+                            'class' => Sender::class,
+                            'query_builder' => function(SenderRepository $senderRepository){
+                                return $senderRepository->createQueryBuilder('s')
+                                            ->where("s.deletedAt IS NULL")
+                                            ->andWhere("s.user = :user")
+                                            ->orderBy("s.title", "ASC")
+                                            ->setParameter("user",$this->getUser())
+                                            ;
+                            },
+                            'choice_label' => 'title'
+                        ])
+                        ->add('content', TextareaType::class,[
+                            'label' => "Votre message ",
+                            'attr'  => [
+                                'placeholder' => "Saisir un commentaire si possible",
+                            ],
+                        ])->getForm();
+
 
         $form->handleRequest($request);
         
@@ -108,7 +156,49 @@ class SMSController extends AbstractController
     public function bulkSMS(Request $request, EntityManagerInterface $manager, PersonRepository $personRepository)
     {
         $bulk = new Favorite();
-        $form = $this->createForm(BulkType::class, $bulk);
+
+        //  $form = $this->createForm(BulkType::class, $bulk);
+
+        $form = $this->createFormBuilder($bulk)
+        ->add('groupes', EntityType::class,[
+            'label' => "Groupe ",
+            'attr'  => [
+                'placeholder' => "Selectionnez le groupe ou catégorie de la personne",
+            ],
+            'class' => Group::class,
+            'query_builder' => function(GroupRepository $groupRepository){
+                return $groupRepository->createQueryBuilder('g')
+                            ->where("g.deletedAt IS NULL")
+                            ->andWhere("g.user = :user")
+                            ->orderBy("g.title", "ASC")
+                            ->setParameter("user", $this->getUser());
+            },
+            'choice_label' => 'title',
+            'multiple' => true
+        ])
+        ->add('sender', EntityType::class,[
+            'label' => "Sender ",
+            'attr'  => [
+                'placeholder' => "Selectionnez le Sender",
+            ],
+            'class' => Sender::class,
+            'query_builder' => function(SenderRepository $senderRepository){
+                return $senderRepository->createQueryBuilder('s')
+                                        ->where("s.deletedAt IS NULL")
+                                        ->andWhere("s.user = :user")
+                                        ->orderBy("s.title", "ASC")
+                                        ->setParameter("user",$this->getUser())
+                                        ;
+            },
+            'choice_label' => 'title'
+        ])
+        ->add('content', TextareaType::class,[
+            'label' => "Votre message ",
+            'attr'  => [
+                'placeholder' => "Saisir un commentaire si possible",
+            ],
+        ])->getForm();
+       
 
         $user = $this->getUser();
 

@@ -45,9 +45,10 @@ class PersonController extends AbstractController
         if($_query){
             $data = $manager->createQuery("
                 SELECT p FROM App\Entity\Person p 
-                WHERE (p.name like :query OR p.phoneMain like :query) AND (p.deletedAt IS NULL) 
+                WHERE (p.name like :query OR p.phoneMain like :query) AND (p.deletedAt IS NULL)  AND (p.user = :user)
                 ORDER BY p.name ASC
             ")  ->setParameter("query", $_query."%")
+                ->setParameter("user", $this->getUser())
                 ->getResult(); 
              //$personRepository->findBy(["name"]);
         } else{

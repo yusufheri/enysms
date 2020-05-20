@@ -16,7 +16,7 @@ class SenderController extends AbstractController
      */
     public function index(SenderRepository $repo)
     {
-        $data = $repo->findBy(["deletedAt" => null], ["title" => "ASC"]);
+        $data = $repo->findBy(["deletedAt" => null, "user" => $this->getUser()], ["title" => "ASC"]);
        
         return $this->render('dashboard/sender/index.html.twig', [
             'data' => $data,

@@ -2,10 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\User;
+use Twig\Environment;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Twig\Environment;
 
 class Paginator{
 
@@ -17,6 +18,8 @@ class Paginator{
 
     private $manager;
     private $twig;
+
+    private $user;
 
     public function __construct(EntityManagerInterface $manager, Environment $twig, RequestStack $request, $templatePath)
     {
@@ -56,7 +59,7 @@ class Paginator{
     }
 
     public function getPages(){
-        $total = count($this->manager->getRepository($this->entityClass)->findAll());
+        $total = count($this->manager->getRepository($this->entityClass)->findBy(["user" => $this->user]));
         return ceil($total / $this->limit);
     }
 
@@ -108,5 +111,9 @@ class Paginator{
         $this->entityClass = $entityClass;
 
         return $this;
+    }
+
+    public function setUser(User $user){
+        $this->user = $user;
     }
 }

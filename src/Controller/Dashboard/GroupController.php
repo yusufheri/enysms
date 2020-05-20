@@ -16,7 +16,7 @@ class GroupController extends AbstractController
      */
     public function index(GroupRepository $repo)
     {
-        $data = $repo->findBy(["deletedAt" => null], ["title" => "ASC"]);
+        $data = $repo->findBy(["deletedAt" => null, "user" => $this->getUser()], ["title" => "ASC"]);
        
         return $this->render('dashboard/group/index.html.twig', [
             'data' => $data,

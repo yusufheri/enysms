@@ -17,11 +17,12 @@ class FavoriteController extends AbstractController
     {
         $paginator  ->setEntityClass(Favorite::class)
                     ->setLimit(10)
-                    ->setPage($page);
+                    ->setPage($page)
+                    ->setUser($this->getUser());
 
         return $this->render('dashboard/favorite/index.html.twig', [
             //'favorites' => $favoriteRepository->findBy([],["createdAt" => "DESC"]),
-            'data' => $paginator->getData(["deletedAt" => null], ["createdAt" => "DESC"]),
+            'data' => $paginator->getData(["deletedAt" => null, "user" => $this->getUser()], ["createdAt" => "DESC"]),
             'paginator' => $paginator,
         ]);
     }
