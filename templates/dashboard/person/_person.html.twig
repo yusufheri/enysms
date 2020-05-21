@@ -3,7 +3,8 @@
         <tr>
             <th>N°</th>
             <th>Contact</th>
-            <th class="text-center">Téléphone 1</th>
+            <th>Téléphone 1</th>
+            <th>Téléphone 2</th>
             <th>Groupe</th>
             <th width="15%" class="text-center">Actions</th>
         </tr>
@@ -14,11 +15,12 @@
             <tr>
                 {% set i = i+1 %}
                 <td>{{i}}</td>
-                <td><a href="#">
+                <td><a href="{{ path('dashboard_person_profile', {'id': member.id}) }}">
                    <img src="/images/avatar.jpg" alt="Avatar de {{member.name}}" class="avatar avatar-mini">                                      
                     {{member.name ~' '~ member.lastname ~' '~ member.surname }}</a>
                 </td>                    
-                <td class="text-center">{{member.phoneMain}} - {{ member.phone }}</td>
+                <td>{{member.phoneMain}}</td>
+                <td>{{ member.phone }}</td>
                 <td >
                     {% for item in member.groupes %}
                         <span class="span badge badge-primary" data-toggle="tooltip" data-placement="bottom" title="{{item.title}}" data-original-title="{{item.title}}">{{ item.title }}</span>
@@ -27,9 +29,9 @@
                 <td class="text-center">
                     <a href="{{ path('dashboard_person_profile', {'id': member.id}) }}" class="btn btn-primary"><i class="fas fa-eye"></i></a> 
                     <a href="{{ path('dashboard_person_edit', {'id': member.id}) }}" class="btn btn-warning"><i class="fas fa-edit"></i></a> 
-                    {% if is_granted("ROLE_ADMIN") %}
+                    {# {% if is_granted("ROLE_ADMIN") %}
                     <a href="{{ path('dashboard_person_profile', {'id': member.id}) }}" class="btn btn-danger"><i class="fas fa-trash"></i></a> 
-                    {% endif %}                   
+                    {% endif %}                    #}
                 </td>
             </tr>
         {% endfor %}

@@ -25,13 +25,15 @@ class PersonController extends AbstractController
     public function index(int $page, Paginator $paginator)
     {
         //  $data = $personRepository->findBy([],["name" => "ASC"]);
+        $user = $this->getUser();
 
         $paginator  ->setEntityClass(Person::class)
-                    ->setLimit(10)
-                    ->setPage($page);
+                    ->setLimit(20)
+                    ->setPage($page)                    
+                    ->setUser($user);
 
         return $this->render('dashboard/person/index.html.twig', [            
-            'data' => $paginator->getData(["deletedAt" => null, "user" => $this->getUser()], ["name" => "ASC", "createdAt" => "DESC"]),
+            'data' => $paginator->getData(["deletedAt" => null, "user" => $user], ["name" => "ASC", "createdAt" => "DESC"]),
             'paginator' => $paginator,
         ]);
     }
@@ -108,7 +110,31 @@ class PersonController extends AbstractController
      */
     public function edit(Request $request, EntityManagerInterface $manager, Person $person){
         
-        $form = $this->createForm(PersonType::class, $person);
+        //  $form = $this->createForm(PersonType::class, $person);
+
+        $form = $this   ->createFormBuilder($person)
+        ->add('groupes', EntityType::class,[
+            'label' => "Groupe ",
+            'attr'  => [
+                'placeholder' => "Selectionnez le groupe ou catégorie de la personne",
+            ],
+            'class' => Group::class,
+            'query_builder' => function(GroupRepository $groupRepository){
+                return $groupRepository->createQueryBuilder('g')
+                            ->where("g.deletedAt IS NULL")
+                            ->andWhere("g.user = :user")
+                            ->orderBy("g.title", "ASC")
+                            ->setParameter("user", $this->getUser());
+            },
+            'choice_label' => 'title',
+            'multiple' => true])
+        ->add('name', TextType::class, $this->getConfiguration("Nom de la personne (*)", "Tapez le nom de la personne"))
+        ->add('lastname', TextType::class, $this->getConfiguration("Post nom", "Tapez le post nom", ["required" => false]))
+        ->add('surname', TextType::class, $this->getConfiguration("Prénom", "Tapez le prénom", ["required" => false]))
+        ->add('phoneMain', TelType::class, $this->getConfiguration("Numéro de téléphone (*)", "Tapez le numéro de téléphone (principal)"))
+        ->add('phone', TelType::class, $this->getConfiguration("Numéro de téléphone", "Tapez le numéro de téléphone", ["required" => false]))
+        ->add('description', TextareaType::class, $this->getConfiguration("Description", "Tapez une petite description du  contact ", ["required" => false]))
+        ->getForm();
 
         $form->handleRequest($request);
 

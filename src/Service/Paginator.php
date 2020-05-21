@@ -16,6 +16,8 @@ class Paginator{
     private $route;
     private $templatePath;
 
+    private $countRows;
+
     private $manager;
     private $twig;
 
@@ -36,6 +38,10 @@ class Paginator{
             'start' => $this->getStart(),
             'route' => $this->route
         ]);
+    }
+
+    public function countTotalRows(){
+        return count($this->manager->getRepository($this->entityClass)->findBy(["user" => $this->user, "deletedAt" => null]));
     }
 
     public function getTemplatePath(){
@@ -59,7 +65,7 @@ class Paginator{
     }
 
     public function getPages(){
-        $total = count($this->manager->getRepository($this->entityClass)->findBy(["user" => $this->user]));
+        $total = count($this->manager->getRepository($this->entityClass)->findBy(["user" => $this->user, "deletedAt" => null]));
         return ceil($total / $this->limit);
     }
 
