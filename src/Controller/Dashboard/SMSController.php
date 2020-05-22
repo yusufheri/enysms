@@ -252,7 +252,7 @@ class SMSController extends AbstractController
                    
                 }              
             }
-            $manager->flush();
+            //  $manager->flush();
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers="";
 
@@ -272,18 +272,20 @@ class SMSController extends AbstractController
                 else {
                     $numbers =$to;
                 }
-                $number_go  [] =  $numbers ;
+               
             }
+            $number_go  [] =  $numbers ;
             
            
            dump( count($number_go));
            //die();
-            for ($j=0; $j < count($number_go)-1; $j++) { 
-               $this->send_easy_sms($number_go[$j],$bulk->getSender()->getTitle(),$bulk->getContent());
-                // dump($response);
-                //die();
-            }
+            for ($j=0; $j < count($number_go); $j++) { 
+               //   $this->send_easy_sms($number_go[$j],$bulk->getSender()->getTitle(),$bulk->getContent());
+               
+                dump($number_go[$j]);
 
+            }
+            die();
             $this->addFlash(
                 "success",
                 "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>"
