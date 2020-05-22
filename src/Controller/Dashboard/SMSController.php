@@ -219,28 +219,12 @@ class SMSController extends AbstractController
 
             foreach($bulk->getGroupes() as $k => $groupes){
                 foreach($groupes->getPeople() as $l => $person){
-                    $counter ++;
-                    $phones [] = $person->getPhoneMain();
-                   
-
-                    $success ++; $state = 1;$status= "OK";
-                    $message = new Message();
-                    $message->setFavorite($bulk)
-                            ->setPerson($person)
-                            ->setState($state)
-                            ->setStatus($status);
-        
-                    $manager->persist($message);
-
-                    if(!is_null($person->getPhone())){
+                    if(!empty($person->getPhoneMain())){
                         $counter ++;
-                        //$status =  $this->send_easy_sms($person->getPhone(),$bulk->getSender()->getTitle(),$bulk->getContent());
-                        
-                        $phones [] = $person->getPhone();
-                        /* if(strpos($status, "OK:") > -1) {
-                            $success ++; $state = 1;
-                        } else {$status = null;$state = null;} */
-                        $success ++; $state = 1;
+                        $phones [] = $person->getPhoneMain();
+                    
+
+                        $success ++; $state = 1;$status= "OK";
                         $message = new Message();
                         $message->setFavorite($bulk)
                                 ->setPerson($person)
@@ -249,12 +233,35 @@ class SMSController extends AbstractController
             
                         $manager->persist($message);
                     }
+                    
+
+                    if(!is_null($person->getPhone())){
+                        if(!empty($person->getPhone())){
+                            $counter ++;
+                            //$status =  $this->send_easy_sms($person->getPhone(),$bulk->getSender()->getTitle(),$bulk->getContent());
+                            
+                            $phones [] = $person->getPhone();
+                            /* if(strpos($status, "OK:") > -1) {
+                                $success ++; $state = 1;
+                            } else {$status = null;$state = null;} */
+                            $success ++; $state = 1;
+                            $message = new Message();
+                            $message->setFavorite($bulk)
+                                    ->setPerson($person)
+                                    ->setState($state)
+                                    ->setStatus($status);
+                
+                            $manager->persist($message);
+                        }
+                        
+                    }
                    
                 }              
             }
             //  $manager->flush();
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers="";
+            dump(count($phones));
 
             for ($i=0; $i < count($phones)-1; $i++) { 
 
