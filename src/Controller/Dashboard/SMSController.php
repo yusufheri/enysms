@@ -259,7 +259,7 @@ class SMSController extends AbstractController
                    
                 }              
             }
-            $manager->flush();
+            //  $manager->flush();
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers=""; $lisungi = 1;
             dump(count($phones));
