@@ -278,6 +278,7 @@ class SMSController extends AbstractController
                     $numbers .=$to;
                     $lisungi = 1;
                     $number_go->add($numbers) ;
+                    $numbers ="";
                 }                
                 else {
                    
