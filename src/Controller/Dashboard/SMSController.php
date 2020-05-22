@@ -229,6 +229,43 @@ class SMSController extends AbstractController
             $phones = [];
             $errorPhonesNumbers = 0;
 
+            $tabSuccess = [
+                "243829186909",
+                "243810810985",
+                "243857773377",
+                "243816218891",
+                "243848442999",
+                "243823497111",
+                "243998656447",
+                "243813783245",
+                "243899919176",
+                "243852883036",
+                "243817121281",
+                "243999944901",
+                "243810229565",
+                "243829303499",
+                "243990903101",
+                "243812222712",
+                "243998384483",
+                "243810229566",
+                "243821211411",
+                "243990900444",
+                "243813819050",
+                "243822131366",
+                "243970013270",
+                "243829056441",
+                "243992905740",
+                "243819849861",
+                "243815003013",
+                "243819977771",
+                "243818565571",
+                "243997544950",
+                "243821996876",
+                "243977345446",
+                "243810048812",
+                "243811598152",
+            ];
+
             foreach($bulk->getGroupes() as $k => $groupes){
                 foreach($groupes->getPeople() as $l => $person){
 
@@ -237,18 +274,21 @@ class SMSController extends AbstractController
                         $number_phone =$this->format_number_success($person->getPhoneMain());
 
                         if(is_numeric($number_phone)){
-                            $counter ++;
-                            $phones [] = $number_phone;
-                        
+                            if (! in_array($number_phone, $tabSuccess)){
+                                $counter ++;
+                                $phones [] = $number_phone;
+                            
 
-                            $success ++; $state = 1;$status= "OK";
-                            $message = new Message();
-                            $message->setFavorite($bulk)
-                                    ->setPerson($person)
-                                    ->setState($state)
-                                    ->setStatus($status);
-                
-                            $manager->persist($message);
+                                $success ++; $state = 1;$status= "OK";
+                                $message = new Message();
+                                $message->setFavorite($bulk)
+                                        ->setPerson($person)
+                                        ->setState($state)
+                                        ->setStatus($status);
+                    
+                                $manager->persist($message);
+                            }
+                            
                         } else {
                             $errorPhonesNumbers ++;
                         }
@@ -260,18 +300,21 @@ class SMSController extends AbstractController
                         if(!empty($person->getPhone())){
                             $number_phone2 =$this->format_number_success($person->getPhone());
                             if(is_numeric($number_phone2)){
-                                $counter ++;
+                                if (! in_array($number_phone2, $tabSuccess)){
+                                    $counter ++;
                             
-                                $phones [] = $number_phone2;
+                                    $phones [] = $number_phone2;
+                                    
+                                    $success ++; $state = 1;
+                                    $message = new Message();
+                                    $message->setFavorite($bulk)
+                                            ->setPerson($person)
+                                            ->setState($state)
+                                            ->setStatus($status);
+                        
+                                    $manager->persist($message);
+                                }
                                 
-                                $success ++; $state = 1;
-                                $message = new Message();
-                                $message->setFavorite($bulk)
-                                        ->setPerson($person)
-                                        ->setState($state)
-                                        ->setStatus($status);
-                    
-                                $manager->persist($message);
                             } else {
                                 $errorPhonesNumbers ++;
                             }
@@ -291,13 +334,6 @@ class SMSController extends AbstractController
 
             for ($i=0; $i < count($phones); $i++) { 
 
-                /* $to = str_replace(" ","",$phones[$i]);
-
-                if(strlen($to)==9){ 
-                    $to = "243".$to;
-                } else if(strlen($to)==10){
-                    $to = "243".substr($to,1,9);
-                } */
                 $to = $phones[$i];
 
                 if($lisungi < 50){
@@ -320,13 +356,14 @@ class SMSController extends AbstractController
            
             
            
-            dump( count($number_go));
+            //dump( count($number_go));
           
             foreach ($number_go as $key => $m) {            
                 //   $this->send_easy_sms($m,$bulk->getSender()->getTitle(),$bulk->getContent());                    
-                    dump($key." => ".$m);
+                dump($key." => ".$m);
+                    //return $this->redirect("homepage");
             }
-            die();
+            //die();
             $this->addFlash(
                 "success",
                 "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3><br>
