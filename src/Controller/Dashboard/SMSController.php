@@ -261,7 +261,7 @@ class SMSController extends AbstractController
             }
             //  $manager->flush();
             //}
-            $k = 1; $number_go = []; $aide= 50;$numbers="";
+            $k = 1; $number_go = []; $aide= 50;$numbers=""; $lisungi = 1;
             dump(count($phones));
             $number_go = new ArrayCollection();
 
@@ -270,15 +270,31 @@ class SMSController extends AbstractController
                 $to = str_replace(" ","",$phones[$i]);
 
                 if(strlen($to)==9) $to = "243".$to;
+                if($lisungi < 50){
+                     $numbers .=$to.",";
+                     $lisungi += 1;
 
-                if ($i <=($aide*$k)){
-                    $numbers .=$to.",";
+                } else if($lisungi == 50){
+                    $numbers .=$to;
+                    $lisungi = 1;
+                    $number_go->add($numbers) ;
+                }                
+                else {
+                   
+                    /* $number_go->add($numbers) ;
+
+                    $numbers =$to.",";
+                    $lisungi = 0; */
+                }
+
+                /* if ($i <=($aide*$k)){
+                   
                 } else {
                     $numbers .=$to;
                     $k+=1;
 
                     $number_go->add($numbers) ;
-                }
+                } */
                
             }
             $number_go->add($numbers) ;
