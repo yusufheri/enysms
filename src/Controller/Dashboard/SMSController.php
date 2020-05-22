@@ -217,35 +217,19 @@ class SMSController extends AbstractController
             $success = 0;$counter = 0;
 
             $phones = [];
+            $errorPhonesNumbers = 0;
 
             foreach($bulk->getGroupes() as $k => $groupes){
                 foreach($groupes->getPeople() as $l => $person){
+
+                    // Premier numéro
                     if(!empty($person->getPhoneMain())){
-                        $counter ++;
-                        $phones [] = $person->getPhoneMain();
-                    
-
-                        $success ++; $state = 1;$status= "OK";
-                        $message = new Message();
-                        $message->setFavorite($bulk)
-                                ->setPerson($person)
-                                ->setState($state)
-                                ->setStatus($status);
-            
-                        $manager->persist($message);
-                    }
-                    
-
-                    if(!is_null($person->getPhone())){
-                        if(!empty($person->getPhone())){
+                        if(is_numeric($person->getPhoneMain())){
                             $counter ++;
-                            //$status =  $this->send_easy_sms($person->getPhone(),$bulk->getSender()->getTitle(),$bulk->getContent());
-                            
-                            $phones [] = $person->getPhone();
-                            /* if(strpos($status, "OK:") > -1) {
-                                $success ++; $state = 1;
-                            } else {$status = null;$state = null;} */
-                            $success ++; $state = 1;
+                            $phones [] = $person->getPhoneMain();
+                        
+
+                            $success ++; $state = 1;$status= "OK";
                             $message = new Message();
                             $message->setFavorite($bulk)
                                     ->setPerson($person)
@@ -253,8 +237,32 @@ class SMSController extends AbstractController
                                     ->setStatus($status);
                 
                             $manager->persist($message);
+                        } else {
+                            $errorPhonesNumbers ++;
                         }
                         
+                    }
+                    
+                    // Deuxième numéro
+                    if(!is_null($person->getPhone())){
+                        if(!empty($person->getPhone())){
+                            if(is_numeric($person->getPhone())){
+                                $counter ++;
+                            
+                                $phones [] = $person->getPhone();
+                                
+                                $success ++; $state = 1;
+                                $message = new Message();
+                                $message->setFavorite($bulk)
+                                        ->setPerson($person)
+                                        ->setState($state)
+                                        ->setStatus($status);
+                    
+                                $manager->persist($message);
+                            } else {
+                                $errorPhonesNumbers ++;
+                            }
+                        }
                     }
                    
                 }              
@@ -263,9 +271,10 @@ class SMSController extends AbstractController
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers=""; $lisungi = 1;
             dump(count($phones));
+
             $number_go = new ArrayCollection();
 
-            $pattern = "^[0-9]#";
+            //$pattern = "[^0-9]#";
 
             for ($i=0; $i < count($phones); $i++) { 
 
@@ -277,21 +286,19 @@ class SMSController extends AbstractController
                     $to = "243".substr($to,1,9);
                 }
 
-                if(preg_match($pattern, $to)){
-                    if($lisungi < 50){
-                        $numbers .=$to.",";
-                        $lisungi += 1;
-   
-                   } else if($lisungi == 50){
-                       $numbers .=$to;
-                       $lisungi = 1;
-                       $number_go->add($numbers) ;
-                       $numbers ="";
-                   } 
-                }               
-            }
+                if($lisungi < 50){
+                    $numbers .=$to.",";
+                    $lisungi += 1;
 
-            $number_go->add($numbers) ;
+                } else if($lisungi == 50){
+                    $numbers .=$to;
+                    $lisungi = 1;
+                    $number_go->add($numbers) ;
+                    $numbers ="";
+                }             
+            }
+            if(!empty($numbers)){ $number_go->add($numbers) ;}
+           
             
            
             dump( count($number_go));
@@ -303,7 +310,8 @@ class SMSController extends AbstractController
             die();
             $this->addFlash(
                 "success",
-                "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>"
+                "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3><br>
+                <h4>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>"
             );
 
             return $this->redirect($request->getUri());
