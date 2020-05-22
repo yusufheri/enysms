@@ -152,7 +152,17 @@ class SMSController extends AbstractController
     }
 
     //  $status =  $this->send_easy_sms($person->getPhoneMain(),$bulk->getSender()->getTitle(),$bulk->getContent());
-                    
+    public function format_number_success($phone){
+        $to = str_replace(" ","",$phone);
+
+        if(strlen($to)==9){ 
+            $to = "243".$to;
+        } else if(strlen($to)==10){
+            $to = "243".substr($to,1,9);
+        }
+
+        return $to;
+    }    
 
     /**
      * @Route("/dashboard/sms/bulk", name="dashboard_bulk_index")
@@ -224,9 +234,11 @@ class SMSController extends AbstractController
 
                     // Premier numéro
                     if(!empty($person->getPhoneMain())){
-                        if(is_numeric($person->getPhoneMain())){
+                        $number_phone =$this->format_number_success($person->getPhoneMain());
+
+                        if(is_numeric($number_phone)){
                             $counter ++;
-                            $phones [] = $person->getPhoneMain();
+                            $phones [] = $number_phone;
                         
 
                             $success ++; $state = 1;$status= "OK";
@@ -246,10 +258,11 @@ class SMSController extends AbstractController
                     // Deuxième numéro
                     if(!is_null($person->getPhone())){
                         if(!empty($person->getPhone())){
-                            if(is_numeric($person->getPhone())){
+                            $number_phone2 =$this->format_number_success($person->getPhone());
+                            if(is_numeric($number_phone2)){
                                 $counter ++;
                             
-                                $phones [] = $person->getPhone();
+                                $phones [] = $number_phone2;
                                 
                                 $success ++; $state = 1;
                                 $message = new Message();
@@ -278,16 +291,22 @@ class SMSController extends AbstractController
 
             for ($i=0; $i < count($phones); $i++) { 
 
-                $to = str_replace(" ","",$phones[$i]);
+                /* $to = str_replace(" ","",$phones[$i]);
 
                 if(strlen($to)==9){ 
                     $to = "243".$to;
                 } else if(strlen($to)==10){
                     $to = "243".substr($to,1,9);
-                }
+                } */
+                $to = $phones[$i];
 
                 if($lisungi < 50){
-                    $numbers .=$to.",";
+                    if($i == (count($phones)-1) ){
+                        $numbers .=$to;
+                    } else {
+                        $numbers .=$to.",";
+                    }
+                   
                     $lisungi += 1;
 
                 } else if($lisungi == 50){
