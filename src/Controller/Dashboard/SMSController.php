@@ -14,6 +14,7 @@ use App\Service\ReportCustomer;
 use App\Repository\GroupRepository;
 use App\Repository\PersonRepository;
 use App\Repository\SenderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -262,6 +263,7 @@ class SMSController extends AbstractController
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers="";
             dump(count($phones));
+            $number_go = new ArrayCollection();
 
             for ($i=0; $i < count($phones); $i++) { 
 
@@ -274,21 +276,25 @@ class SMSController extends AbstractController
                 } else {
                     $numbers .=$to;
                     $k+=1;
-                    $number_go  [] =  $numbers ;
+
+                    $number_go->add($numbers) ;
                 }
                
             }
-            $number_go  [] =  $numbers ;
+            $number_go->add($numbers) ;
             
            
            dump( count($number_go));
            //die();
-            for ($j=0; $j < count($number_go); $j++) { 
+           foreach ($number_go as $key => $m) {
+            dump($m);
+           }
+            //for ($j=0; $j < count($number_go); $j++) { 
                //   $this->send_easy_sms($number_go[$j],$bulk->getSender()->getTitle(),$bulk->getContent());
                
-                dump($number_go[$j]);
+                
 
-            }
+            //}
             die();
             $this->addFlash(
                 "success",
