@@ -302,17 +302,12 @@ class SMSController extends AbstractController
             
            
            dump( count($number_go));
-           //die();
-           foreach ($number_go as $key => $m) {
-            dump($m);
+          
+           foreach ($number_go as $key => $m) {            
+                $response = $this->send_easy_sms($m,$bulk->getSender()->getTitle(),$bulk->getContent());                    
+                dump($response);
            }
-            //for ($j=0; $j < count($number_go); $j++) { 
-               //   $this->send_easy_sms($number_go[$j],$bulk->getSender()->getTitle(),$bulk->getContent());
-               
-                
-
-            //}
-            die();
+            
             $this->addFlash(
                 "success",
                 "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>"
