@@ -221,9 +221,7 @@ class SMSController extends AbstractController
                 foreach($groupes->getPeople() as $l => $person){
                     $counter ++;
                     $phones [] = $person->getPhoneMain();
-                   /*  if(strpos($status, "OK:") > -1) {
-                        $success ++; $state = 1;
-                    } else {$status = null;$state = null;} */
+                   
 
                     $success ++; $state = 1;$status= "OK";
                     $message = new Message();
@@ -238,7 +236,7 @@ class SMSController extends AbstractController
                         $counter ++;
                         //$status =  $this->send_easy_sms($person->getPhone(),$bulk->getSender()->getTitle(),$bulk->getContent());
                         
-                        $phones [] = $person->$person->getPhone();
+                        $phones [] = $person->getPhone();
                         /* if(strpos($status, "OK:") > -1) {
                             $success ++; $state = 1;
                         } else {$status = null;$state = null;} */
@@ -256,14 +254,16 @@ class SMSController extends AbstractController
             }
             $manager->flush();
             //}
-            $k = 1; $number_go = []; $aide= 50;
+            $k = 1; $number_go = []; $aide= 50;$numbers="";
+
             for ($i=0; $i < count($phones)-1; $i++) { 
+
                 $to = str_replace(" ","",$phones[$i]);
 
                 if(strlen($to)==9) $to = "243".$to;
 
                 if ($i <($aide*$k)){
-                    $numbers .=$to.";";
+                    $numbers .=$to.",";
                 } else if($i==($aide*$k)){
                     $numbers .=$to;
                     $k=2;
@@ -272,17 +272,23 @@ class SMSController extends AbstractController
                 else {
                     $numbers =$to;
                 }
-              
+                $number_go  [] =  $numbers ;
             }
             
+           
+           dump( count($number_go));
+           //die();
+            for ($j=0; $j < count($number_go)-1; $j++) { 
+               $response =  $this->send_easy_sms($number_go[$j],$bulk->getSender()->getTitle(),$bulk->getContent());
+                dump($response);
+                //die();
+            }
+
             $this->addFlash(
                 "success",
                 "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>"
             );
-           
-            for ($j=0; $j < count($number_go)-1; $j++) { 
-                $this->send_easy_sms($number_go[$j],$bulk->getSender()->getTitle(),$bulk->getContent());
-            }
+
             return $this->redirect($request->getUri());
         }
 
