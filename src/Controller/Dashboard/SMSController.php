@@ -265,48 +265,41 @@ class SMSController extends AbstractController
             dump(count($phones));
             $number_go = new ArrayCollection();
 
+            $pattern = "^[0-9]#";
+
             for ($i=0; $i < count($phones); $i++) { 
 
                 $to = str_replace(" ","",$phones[$i]);
 
-                if(strlen($to)==9) $to = "243".$to;
-                if($lisungi < 50){
-                     $numbers .=$to.",";
-                     $lisungi += 1;
-
-                } else if($lisungi == 50){
-                    $numbers .=$to;
-                    $lisungi = 1;
-                    $number_go->add($numbers) ;
-                    $numbers ="";
-                }                
-                else {
-                   
-                    /* $number_go->add($numbers) ;
-
-                    $numbers =$to.",";
-                    $lisungi = 0; */
+                if(strlen($to)==9){ 
+                    $to = "243".$to;
+                } else if(strlen($to)==10){
+                    $to = "243".substr($to,1,9);
                 }
 
-                /* if ($i <=($aide*$k)){
-                   
-                } else {
-                    $numbers .=$to;
-                    $k+=1;
-
-                    $number_go->add($numbers) ;
-                } */
-               
+                if(preg_match($pattern, $to)){
+                    if($lisungi < 50){
+                        $numbers .=$to.",";
+                        $lisungi += 1;
+   
+                   } else if($lisungi == 50){
+                       $numbers .=$to;
+                       $lisungi = 1;
+                       $number_go->add($numbers) ;
+                       $numbers ="";
+                   } 
+                }               
             }
+
             $number_go->add($numbers) ;
             
            
-           dump( count($number_go));
+            dump( count($number_go));
           
-           foreach ($number_go as $key => $m) {            
-               //   $this->send_easy_sms($m,$bulk->getSender()->getTitle(),$bulk->getContent());                    
-                dump($m);
-           }
+            foreach ($number_go as $key => $m) {            
+                //   $this->send_easy_sms($m,$bulk->getSender()->getTitle(),$bulk->getContent());                    
+                    dump($m);
+            }
             die();
             $this->addFlash(
                 "success",
