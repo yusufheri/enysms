@@ -269,15 +269,12 @@ class SMSController extends AbstractController
 
                 if(strlen($to)==9) $to = "243".$to;
 
-                if ($i <($aide*$k)){
+                if ($i <=($aide*$k)){
                     $numbers .=$to.",";
-                } else if($i==($aide*$k)){
+                } else {
                     $numbers .=$to;
-                    $k=2;
+                    $k+=1;
                     $number_go  [] =  $numbers ;
-                }
-                else {
-                    $numbers =$to;
                 }
                
             }
