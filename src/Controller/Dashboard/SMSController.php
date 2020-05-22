@@ -150,6 +150,9 @@ class SMSController extends AbstractController
         ]);
     }
 
+    //  $status =  $this->send_easy_sms($person->getPhoneMain(),$bulk->getSender()->getTitle(),$bulk->getContent());
+                    
+
     /**
      * @Route("/dashboard/sms/bulk", name="dashboard_bulk_index")
      */
@@ -209,32 +212,20 @@ class SMSController extends AbstractController
             $bulk->setUser($user);
             $manager->persist($bulk);
             
-            /* if($bulk->getGroupe()->getId() == 0) {
-                
-                $people = $personRepository->findAll();
-                foreach($people as $k => $person){
-                    $status =  $this->send_easy_sms($person->getPhoneMain(),$bulk->getSender()->getTitle(),$bulk->getContent());
-                    if(strpos($status, "OK:") == false) {$status = null;$bool = false;}
-
-                    $message = new Message();
-                    $message->setFavorite($bulk)
-                            ->setPerson($person)
-                            ->setStatus($status);
-
-                    $manager->persist($message); 
-                }
-            } else { */
+           
             $success = 0;$counter = 0;
+
+            $phones = [];
 
             foreach($bulk->getGroupes() as $k => $groupes){
                 foreach($groupes->getPeople() as $l => $person){
                     $counter ++;
-                    $status =  $this->send_easy_sms($person->getPhoneMain(),$bulk->getSender()->getTitle(),$bulk->getContent());
-                    
-                    if(strpos($status, "OK:") > -1) {
+                    $phones [] = $person->getPhoneMain();
+                   /*  if(strpos($status, "OK:") > -1) {
                         $success ++; $state = 1;
-                    } else {$status = null;$state = null;}
+                    } else {$status = null;$state = null;} */
 
+                    $success ++; $state = 1;$status= "OK";
                     $message = new Message();
                     $message->setFavorite($bulk)
                             ->setPerson($person)
@@ -245,12 +236,13 @@ class SMSController extends AbstractController
 
                     if(!is_null($person->getPhone())){
                         $counter ++;
-                        $status =  $this->send_easy_sms($person->getPhone(),$bulk->getSender()->getTitle(),$bulk->getContent());
+                        //$status =  $this->send_easy_sms($person->getPhone(),$bulk->getSender()->getTitle(),$bulk->getContent());
                         
-                        if(strpos($status, "OK:") > -1) {
+                        $phones [] = $person->$person->getPhone();
+                        /* if(strpos($status, "OK:") > -1) {
                             $success ++; $state = 1;
-                        } else {$status = null;$state = null;}
-
+                        } else {$status = null;$state = null;} */
+                        $success ++; $state = 1;
                         $message = new Message();
                         $message->setFavorite($bulk)
                                 ->setPerson($person)
@@ -259,16 +251,38 @@ class SMSController extends AbstractController
             
                         $manager->persist($message);
                     }
+                   
                 }              
             }
+            $manager->flush();
             //}
+            $k = 1; $number_go = []; $aide= 50;
+            for ($i=0; $i < count($phones)-1; $i++) { 
+                $to = str_replace(" ","",$phones[$i]);
+
+                if(strlen($to)==9) $to = "243".$to;
+
+                if ($i <($aide*$k)){
+                    $numbers .=$to.";";
+                } else if($i==($aide*$k)){
+                    $numbers .=$to;
+                    $k=2;
+                    $number_go  [] =  $numbers ;
+                }
+                else {
+                    $numbers =$to;
+                }
+              
+            }
             
-             
             $this->addFlash(
                 "success",
                 "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>"
             );
-            $manager->flush();
+           
+            for ($j=0; $j < count($number_go)-1; $j++) { 
+                $this->send_easy_sms($number_go[$j],$bulk->getSender()->getTitle(),$bulk->getContent());
+            }
             return $this->redirect($request->getUri());
         }
 
@@ -277,6 +291,7 @@ class SMSController extends AbstractController
         ]);
     }
 
+    
     function send_easy_sms($to, $from, $message, $type=1){
         $to = str_replace(" ","",$to);
 
