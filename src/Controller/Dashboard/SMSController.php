@@ -263,7 +263,7 @@ class SMSController extends AbstractController
             $k = 1; $number_go = []; $aide= 50;$numbers="";
             dump(count($phones));
 
-            for ($i=0; $i < count($phones)-1; $i++) { 
+            for ($i=0; $i < count($phones); $i++) { 
 
                 $to = str_replace(" ","",$phones[$i]);
 
