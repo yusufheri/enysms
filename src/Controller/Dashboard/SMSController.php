@@ -304,8 +304,8 @@ class SMSController extends AbstractController
            dump( count($number_go));
           
            foreach ($number_go as $key => $m) {            
-                $response = $this->send_easy_sms($m,$bulk->getSender()->getTitle(),$bulk->getContent());                    
-                dump($response);
+               $this->send_easy_sms($m,$bulk->getSender()->getTitle(),$bulk->getContent());                    
+                //dump($response);
            }
             
             $this->addFlash(
