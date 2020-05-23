@@ -241,31 +241,7 @@ class SMSController extends AbstractController
             $phones = [];
             $errorPhonesNumbers = 0;
 
-            $tabSuccess = [
-                //243823445702,243978356874,243112176288,243811700037,243815145304,243998360650,243826656665,243819722300,243813437942,243842541459,243819213377,243999189512,243816401562,243816663848,243896778629,243814526011,243810078561,243840881759,243815858017,243816166625,243818030572,243810001479,243810579211,243992579539,243999938030
-                
-                "243810531453",
-                "243977730984",
-                "243991858713",
-                "243995474826",
-                "243810362173",
-                "243820667417",
-                "243825001125",
-                "243997320192",
-                "243819732019",
-                "243998119444",
-                "243978450500",
-                "243851384581",
-                "243814752265",
-                "243814670698",
-                "243817835634",
-                "243852914028",
-                "243894492083",
-                "243821798100",
-                "243973378311",
-                "243825001199",
-                "243822114402"            
-            ];
+            $tabSuccess = [];
 
             foreach($bulk->getGroupes() as $k => $groupes){
                 foreach($groupes->getPeople() as $l => $person){
@@ -275,7 +251,7 @@ class SMSController extends AbstractController
                         $number_phone =$this->format_number_success($person->getPhoneMain());
 
                         if(is_numeric($number_phone)){
-                            if ( in_array($number_phone, $tabSuccess)){
+                            //if ( in_array($number_phone, $tabSuccess)){
                                 $counter ++;
                                 $phones [] = $number_phone;
                             
@@ -288,7 +264,7 @@ class SMSController extends AbstractController
                                         ->setStatus($status);
                     
                                 $manager->persist($message);
-                            }
+                            //}
                             
                         } else {
                             $errorPhonesNumbers ++;
@@ -301,7 +277,7 @@ class SMSController extends AbstractController
                         if(!empty($person->getPhone())){
                             $number_phone2 =$this->format_number_success($person->getPhone());
                             if(is_numeric($number_phone2)){
-                                if ( in_array($number_phone2, $tabSuccess)){
+                                //if ( in_array($number_phone2, $tabSuccess)){
                                     $counter ++;
                             
                                     $phones [] = $number_phone2;
@@ -314,7 +290,7 @@ class SMSController extends AbstractController
                                             ->setStatus($status);
                         
                                     $manager->persist($message);
-                                }
+                                //}
                                 
                             } else {
                                 $errorPhonesNumbers ++;
@@ -324,7 +300,7 @@ class SMSController extends AbstractController
                    
                 }              
             }
-            //$manager->flush();
+            $manager->flush();
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers=""; $lisungi = 1;
             //dump(count($phones));
