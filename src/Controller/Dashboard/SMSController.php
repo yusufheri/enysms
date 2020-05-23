@@ -350,7 +350,7 @@ class SMSController extends AbstractController
             //$manager->flush();
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers=""; $lisungi = 1;
-            dump(count($phones));
+            //dump(count($phones));
 
             $number_go = new ArrayCollection();
 
@@ -387,8 +387,7 @@ class SMSController extends AbstractController
                  <h4 class='text-warning'>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>"
             );
             // $request->getUri()
-            dump($urls);
-            die();
+           
             return $this->redirectToRoute("dashboard_bulk_index", [
                 'urls' => $urls
             ]);

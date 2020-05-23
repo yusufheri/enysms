@@ -26,16 +26,7 @@
                                 </div>
                             {% endfor %}
 
-                        {% if urls is defined %}
-                            {% set i = 0 %}
-                            {% for url in urls %}
-                                {% set i = i+1 %}
-                                <div class="row" id="url_{{i}}">
-                                    <div class="col-md-8"><input type="url" name="" id="" value=""></div>
-                                    <div class="col-md-4"><a href="{{ url }}" class="btn btn-danger">Envoyez</a></div>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+                       
 
                             <h2 class="my-3">Bulk SMS </h2>
                             <hr>
@@ -67,6 +58,10 @@
         </div>
         
     </div>
+    {% if urls is defined %}
+        {% include "dashboard/sms/modal.html.twig" with {'urls': urls} %}
+    {% endif %}
+    
     
 {% endblock %}
 {% block javascripts %}
@@ -74,6 +69,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
     {{ encore_entry_script_tags('js/dashboard') }}   
     <script>
+    if($("#exampleModal") != undefined){
+        $("#exampleModal").modal("show");
+    }
     $('select').selectize();
         function readURL(input) {
             if (input.files && input.files[0]) {

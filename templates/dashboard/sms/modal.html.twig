@@ -1,0 +1,35 @@
+ <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Términer l'opération</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+           <div class="row text-center">
+                <p class="text-bold  ml-2 mr-2">Appuyez sur chaque bouton <b>Envoyez</b>.
+            </div>
+
+            <div class="row text-center">
+                {% if urls is defined %}
+                    {% set i = 0 %}
+                    {% for url in urls %}
+                        {% set i = i+1 %}
+                        <div class="row" id="url_{{i}}">
+                            <div class="col-md-8"><input type="url" name="" id="" value=""></div>
+                            <div class="col-md-4"><a href="{{ url }}" class="btn btn-danger" target="_blank">Envoyez</a></div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+             
+        </div>
+        <div class="modal-footer">
+            Merci beaucoup pour avoir choisi EnySMS
+        </div>
+        </div>
+    </div>
+</div>
+
