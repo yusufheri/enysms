@@ -440,14 +440,46 @@ class SMSController extends AbstractController
         foreach($multiCurl as $k => $ch) {
            
             $result[$k] = curl_multi_getcontent($ch);
-            curl_multi_remove_handle($mh, $ch);
-            dump( $result[$k]);
+            curl_multi_remove_handle($mh, $ch);           
         }
         die();
         // close
         curl_multi_close($mh); 
     
         return $result;
+    }
+
+    function send_easy_sms_2($number_go, $from, $message, $type=1){
+
+        $username = "yusuyher2020";
+        $password = "esm38240";
+
+        // array of curl handles
+        $multiCurl = array();
+        // data to be returned
+        $result = array();
+        // multi handle
+        $mh = curl_multi_init();
+
+        foreach ($number_go as $i => $to) {
+
+            $fetchURL =  "https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=$username&password=$password&from=$from&to=$to&text=".urlencode($message)."&type=$type";         
+           /*  $multiCurl[$i] = curl_init();
+
+            curl_setopt($multiCurl[$i], CURLOPT_URL,$fetchURL);
+            curl_setopt($multiCurl[$i], CURLOPT_SSL_VERIFYPEER,false);
+            curl_setopt($multiCurl[$i], CURLOPT_RETURNTRANSFER,true);
+            curl_setopt($multiCurl[$i], CURLOPT_SSL_VERIFYHOST, 2);
+            curl_setopt($multiCurl[$i], CURLOPT_TIMEOUT_MS, 200); */
+            
+            //  curl_setopt($multiCurl[$i], CURLOPT_HEADER,false);
+            //  curl_setopt($multiCurl[$i], CURLOPT_RETURNTRANSFER,true);
+
+            //curl_multi_add_handle($mh, $multiCurl[$i]); 
+           dump($fetchURL);
+        }  
+        die();
+        
     }
 
     /**
