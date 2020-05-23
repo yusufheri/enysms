@@ -242,31 +242,8 @@ class SMSController extends AbstractController
             $errorPhonesNumbers = 0;
 
             $tabSuccess = [
-                "243823445702",
-                "243978356874",
-                "243112176288",
-                "243811700037",
-                "243815145304",
-                "243998360650",
-                "243826656665",
-                "243819722300",
-                "243813437942",
-                "243842541459",
-                "243819213377",
-                "243999189512",
-                "243816401562",
-                "243816663848",
-                "243896778629",
-                "243814526011",
-                "243810078561",
-                "243840881759",
-                "243815858017",
-                "243816166625",
-                "243818030572",
-                "243810001479",
-                "243810579211",
-                "243992579539",
-                "243999938030",
+                //243823445702,243978356874,243112176288,243811700037,243815145304,243998360650,243826656665,243819722300,243813437942,243842541459,243819213377,243999189512,243816401562,243816663848,243896778629,243814526011,243810078561,243840881759,243815858017,243816166625,243818030572,243810001479,243810579211,243992579539,243999938030
+                
                 "243810531453",
                 "243977730984",
                 "243991858713",
@@ -383,28 +360,24 @@ class SMSController extends AbstractController
             $lisungi = "";
             foreach($urls as $k => $url){
                 $lisungi .= '
-                <div class="row">
-                    <div class="col-md-8">'.$url.'</div>
-                    <div class="col-md-4"><a href="'.$url.'" class="btn btn-danger text-decoration-none">
+                <div class="row" id="url_'.$k.'">
+                    <div class="col-md-6"> Appuyer sur le bouton pour términer l opération </div>
+                    <div class="col-md-6"><a target="_blank" href="'.$url.'" id="_'.$k.'" class="btn_url btn btn-danger text-decoration-none">
                     <i class="fas fa-check"></i> Envoyez</a></div>
                 </div>';
             }
             $this->addFlash(
                 "success",
-                "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>.
-                 <h4 class='text-warning'>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>".
-                 $lisungi
+                '<h4>Le bulk SMS s est términé. ('.$success.'/'.$counter.') + '.$errorPhonesNumbers.' numéros de téléphone incorrects</h4>
+                 <div class="row">'. $lisungi.'</div>'
             );
             // $request->getUri()
            
-            return $this->redirectToRoute("dashboard_bulk_index", [
-                'urls' => $urls
-            ]);
+            return $this->redirectToRoute("dashboard_bulk_index");
         }
 
         return $this->render('dashboard/sms/index.html.twig', [
             'form' => $form->createView(),
-            'urls' => $urls
         ]);
     }
 

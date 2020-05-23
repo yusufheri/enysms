@@ -12,9 +12,7 @@
         <div class="row">
             {% include "dashboard/partials/menu.html.twig" %}
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">  
-                {% if urls is defined %}
-                    {% include "dashboard/sms/modal.html.twig" with {'urls': urls} %}
-                {% endif %}
+                
                 <div class="container">
                     <div class="row-md px-5">
                         {% for label, messages in app.flashes %}
@@ -69,9 +67,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
     {{ encore_entry_script_tags('js/dashboard') }}   
     <script>
-    if($("#exampleModal") != undefined){
-        $("#exampleModal").modal("show");
-    }
+    $('.btn_url').on('click', function(e){
+        e.preventDefault();
+        var node = $(this).parentNode().parentNode();
+        node.parent.removeChild(node)
+
+    })
+    
     $('select').selectize();
         function readURL(input) {
             if (input.files && input.files[0]) {
