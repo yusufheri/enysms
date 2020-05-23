@@ -355,19 +355,12 @@ class SMSController extends AbstractController
             if(!empty($numbers)){ $number_go->add($numbers) ;}
            
             
-           
-            //dump( count($number_go));
-          
-            foreach ($number_go as $key => $m) {            
-                //   $this->send_easy_sms($m,$bulk->getSender()->getTitle(),$bulk->getContent());                    
-                dump($key." => ".$m);
-                    //return $this->redirect("homepage");
-            }
-            //die();
+            $this->send_easy_sms($number_go,$bulk->getSender()->getTitle(),$bulk->getContent());  
+
             $this->addFlash(
                 "success",
-                "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3><br>
-                <h4>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>"
+                "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>.
+                 <h4 class='text-danger'>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>"
             );
 
             return $this->redirect($request->getUri());
@@ -379,23 +372,40 @@ class SMSController extends AbstractController
     }
 
     
-    function send_easy_sms($to, $from, $message, $type=1){
-        $to = str_replace(" ","",$to);
-
-        if(strlen($to)==9) $to = "243".$to;
+    function send_easy_sms($number_go, $from, $message, $type=1){
 
         $username = "yusuyher2020";
         $password = "esm38240";
-        $url = "https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=$username&password=$password&from=$from&to=$to&text=".urlencode($message)."&type=$type";
+
+        // array of curl handles
+        $multiCurl = array();
+        // data to be returned
+        $result = array();
+        // multi handle
+        $mh = curl_multi_init();
+        foreach ($number_go as $i => $to) {
+
+            $fetchURL =  "https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=$username&password=$password&from=$from&to=$to&text=".urlencode($message)."&type=$type";         
+            /* $multiCurl[$i] = curl_init();
+            curl_setopt($multiCurl[$i], CURLOPT_URL,$fetchURL);
+            curl_setopt($multiCurl[$i], CURLOPT_HEADER,0);
+            curl_multi_add_handle($mh, $multiCurl[$i]); */
+            dump($fetchURL);
+        }  
+        die();
         
-        $curl =  curl_init();
-    
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-        $result = curl_exec($curl);
-        curl_close($curl); 
+        /* $index=null;
+        do {
+            curl_multi_exec($mh,$index);
+        } while($index > 0);
+
+        // get content and remove handles
+        foreach($multiCurl as $k => $ch) {
+            $result[$k] = curl_multi_getcontent($ch);
+            curl_multi_remove_handle($mh, $ch);
+        }
+        // close
+        curl_multi_close($mh); */
     
         return $result;
     }
