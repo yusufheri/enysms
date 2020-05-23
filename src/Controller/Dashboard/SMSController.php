@@ -384,8 +384,9 @@ class SMSController extends AbstractController
             foreach($urls as $k => $url){
                 $lisungi .= '
                 <div class="row">
-                    <div class="col-md-8">".$url."</div>
-                    <div class="col-md-4"><a href=".$url." class="btn btn-danger">Envoyez</a></div>
+                    <div class="col-md-8">'.$url.'</div>
+                    <div class="col-md-4"><a href="'.$url.'" class="btn btn-danger text-decoration-none">
+                    <i class="fas fa-check"></i> Envoyez</a></div>
                 </div>';
             }
             $this->addFlash(
