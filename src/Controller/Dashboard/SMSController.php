@@ -276,6 +276,49 @@ class SMSController extends AbstractController
                 "243977345446",
                 "243810048812",
                 "243811598152",
+                "243814093998",
+                "243971303675",
+                "243817408190",
+                "243819601527",
+                "243971205016",
+                "243811609505",
+                "243810204000",
+                "243990929588",
+                "243816033194",
+                "243853439260",
+                "243810331127",
+                "243998468398",
+                "243998510007",
+                "243824851593",
+                "243813604896",
+                "243818225974",
+                "243814559118",
+                "243816968511",
+                "243999903108",
+                "243816853830",
+                "243844112133",
+                "243997800703",
+                "243817576908",
+                "243858268616",
+                "243815191642",
+                "243992492654",
+                "243812570547",
+                "243999939259",
+                "243812222889",
+                "243998677832",
+                "243819311174",
+                "243991177771",
+                "243810252428",
+                "243998623919",
+                "243895430133",
+                "243817800068",
+                "243999393899",
+                "243814037080",
+                "243997016435",
+                "243995768001",
+                "243998289145",
+                "243990903892",
+                "243817006972"
             ];
 
             foreach($bulk->getGroupes() as $k => $groupes){
@@ -343,12 +386,12 @@ class SMSController extends AbstractController
             $number_go = new ArrayCollection();
 
             //$pattern = "[^0-9]#";
-
+            $aide = 25;
             for ($i=0; $i < count($phones); $i++) { 
 
                 $to = $phones[$i];
 
-                if($lisungi < 50){
+                if($lisungi < $aide){
                     if($i == (count($phones)-1) ){
                         $numbers .=$to;
                     } else {
@@ -357,7 +400,7 @@ class SMSController extends AbstractController
                    
                     $lisungi += 1;
 
-                } else if($lisungi == 50){
+                } else if($lisungi == $aide){
                     $numbers .=$to;
                     $lisungi = 1;
                     $number_go->add($numbers) ;
@@ -367,7 +410,7 @@ class SMSController extends AbstractController
             if(!empty($numbers)){ $number_go->add($numbers) ;}
            
             
-            $this->send_easy_sms_2($number_go,$bulk->getSender()->getTitle(),$bulk->getContent());  
+            $this->send_easy_sms($number_go,$bulk->getSender()->getTitle(),$bulk->getContent());  
 
             $this->addFlash(
                 "success",
