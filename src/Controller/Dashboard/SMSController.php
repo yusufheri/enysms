@@ -437,12 +437,11 @@ class SMSController extends AbstractController
         } while($index > 0);
 
         // get content and remove handles
-        foreach($multiCurl as $k => $ch) {
-           
+        foreach($multiCurl as $k => $ch) {           
             $result[$k] = curl_multi_getcontent($ch);
             curl_multi_remove_handle($mh, $ch);           
         }
-        die();
+        //die();
         // close
         curl_multi_close($mh); 
     
