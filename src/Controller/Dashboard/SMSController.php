@@ -115,25 +115,37 @@ class SMSController extends AbstractController
             $single->setUser($user);
             $manager->persist($single);
 
+            
             $person = $single->getPhone();
 
-            $status =  $this->send_easy_sms($person->getPhoneMain(),$single->getSender()->getTitle(),$single->getContent());
-            $bool = true;
-            $state = 1;
+            $phone = $this->format_number_success($person->getPhoneMain());
 
-            if(strpos($status, "OK:") > -1) {
-                $state = 1;
-            } else {$status = null;$state = null;$bool = false;}
+            if(is_numeric($phone)) {
 
-            //if(strpos($status, "OK:") == false) {$status = null;$bool = false;$state = null;}
+                $number_go = new ArrayCollection();
+                $number_go->add($phone);
 
-            $message = new Message();
-            $message->setFavorite($single)
-                    ->setPerson($person)
-                    ->setState($state)
-                    ->setStatus($status);
+                $status = $this->send_easy_sms($number_go, $single->getSender()->getTitle(), $single->getContent());
+                // dump("Status : " . $status[0]);
+                //  die();
 
-            $manager->persist($message);
+                $bool = true; 
+                $status_string = $status[0];
+
+                if (strlen($status_string) < 60)
+                {   $state = 1;    } 
+                else { $state = 0; }
+
+                $message = new Message();
+                $message->setFavorite($single)
+                        ->setPerson($person)
+                        ->setState($state)
+                        ->setStatus($status_string);
+
+                $manager->persist($message);
+            } else {
+                $bool = false;
+            }            
 
             $manager->flush();
             if($bool) {
@@ -142,7 +154,7 @@ class SMSController extends AbstractController
                 $this->addFlash("danger","Le SMS n'est pas envoyé au destinataire, prière de vérifier votre connexion");
             }
            
-            $manager->flush();
+            //  $manager->flush();
             return $this->redirect($request->getUri());
         }
 
@@ -174,44 +186,44 @@ class SMSController extends AbstractController
         //  $form = $this->createForm(BulkType::class, $bulk);
 
         $form = $this->createFormBuilder($bulk)
-        ->add('groupes', EntityType::class,[
-            'label' => "Groupe ",
-            'attr'  => [
-                'placeholder' => "Selectionnez le groupe ou catégorie de la personne",
-            ],
-            'class' => Group::class,
-            'query_builder' => function(GroupRepository $groupRepository){
-                return $groupRepository->createQueryBuilder('g')
-                            ->where("g.deletedAt IS NULL")
-                            ->andWhere("g.user = :user")
-                            ->orderBy("g.title", "ASC")
-                            ->setParameter("user", $this->getUser());
-            },
-            'choice_label' => 'title',
-            'multiple' => true
-        ])
-        ->add('sender', EntityType::class,[
-            'label' => "Sender ",
-            'attr'  => [
-                'placeholder' => "Selectionnez le Sender",
-            ],
-            'class' => Sender::class,
-            'query_builder' => function(SenderRepository $senderRepository){
-                return $senderRepository->createQueryBuilder('s')
-                                        ->where("s.deletedAt IS NULL")
-                                        ->andWhere("s.user = :user")
-                                        ->orderBy("s.title", "ASC")
-                                        ->setParameter("user",$this->getUser())
-                                        ;
-            },
-            'choice_label' => 'title'
-        ])
-        ->add('content', TextareaType::class,[
-            'label' => "Votre message ",
-            'attr'  => [
-                'placeholder' => "Saisir un commentaire si possible",
-            ],
-        ])->getForm();
+                        ->add('groupes', EntityType::class,[
+                            'label' => "Groupe ",
+                            'attr'  => [
+                                'placeholder' => "Selectionnez le groupe ou catégorie de la personne",
+                            ],
+                            'class' => Group::class,
+                            'query_builder' => function(GroupRepository $groupRepository){
+                                return $groupRepository->createQueryBuilder('g')
+                                            ->where("g.deletedAt IS NULL")
+                                            ->andWhere("g.user = :user")
+                                            ->orderBy("g.title", "ASC")
+                                            ->setParameter("user", $this->getUser());
+                            },
+                            'choice_label' => 'title',
+                            'multiple' => true
+                        ])
+                        ->add('sender', EntityType::class,[
+                            'label' => "Sender ",
+                            'attr'  => [
+                                'placeholder' => "Selectionnez le Sender",
+                            ],
+                            'class' => Sender::class,
+                            'query_builder' => function(SenderRepository $senderRepository){
+                                return $senderRepository->createQueryBuilder('s')
+                                                        ->where("s.deletedAt IS NULL")
+                                                        ->andWhere("s.user = :user")
+                                                        ->orderBy("s.title", "ASC")
+                                                        ->setParameter("user",$this->getUser())
+                                                        ;
+                            },
+                            'choice_label' => 'title'
+                        ])
+                        ->add('content', TextareaType::class,[
+                            'label' => "Votre message ",
+                            'attr'  => [
+                                'placeholder' => "Saisir un commentaire si possible",
+                            ],
+                        ])->getForm();
        
 
         $user = $this->getUser();
@@ -323,7 +335,7 @@ class SMSController extends AbstractController
                    
                 }              
             }
-            //  $manager->flush();
+            $manager->flush();
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers=""; $lisungi = 1;
             dump(count($phones));
@@ -360,7 +372,7 @@ class SMSController extends AbstractController
             $this->addFlash(
                 "success",
                 "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>.
-                 <h4 class='text-danger'>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>"
+                 <h4 class='text-warning'>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>"
             );
 
             return $this->redirect($request->getUri());
@@ -371,6 +383,22 @@ class SMSController extends AbstractController
         ]);
     }
 
+    function send_easy_sms_single($to, $from, $message, $type=1){
+        $username = "yusuyher2020";
+        $password = "esm38240";
+        $url = "https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=$username&password=$password&from=$from&to=$to&text=".urlencode($message)."&type=$type";
+        
+        $curl =  curl_init();
+    
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+        $result = curl_exec($curl);
+        curl_close($curl); 
+    
+        return $result;
+    }
     
     function send_easy_sms($number_go, $from, $message, $type=1){
 
@@ -383,18 +411,26 @@ class SMSController extends AbstractController
         $result = array();
         // multi handle
         $mh = curl_multi_init();
+
         foreach ($number_go as $i => $to) {
 
             $fetchURL =  "https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=$username&password=$password&from=$from&to=$to&text=".urlencode($message)."&type=$type";         
-            /* $multiCurl[$i] = curl_init();
+            $multiCurl[$i] = curl_init();
+
             curl_setopt($multiCurl[$i], CURLOPT_URL,$fetchURL);
-            curl_setopt($multiCurl[$i], CURLOPT_HEADER,0);
-            curl_multi_add_handle($mh, $multiCurl[$i]); */
+            curl_setopt($multiCurl[$i], CURLOPT_SSL_VERIFYPEER,false);
+            curl_setopt($multiCurl[$i], CURLOPT_RETURNTRANSFER,true);
+            curl_setopt($multiCurl[$i], CURLOPT_SSL_VERIFYHOST, 2);
+            
+            //  curl_setopt($multiCurl[$i], CURLOPT_HEADER,false);
+            //  curl_setopt($multiCurl[$i], CURLOPT_RETURNTRANSFER,true);
+
+            curl_multi_add_handle($mh, $multiCurl[$i]); 
             dump($fetchURL);
         }  
-        die();
+        // die();
         
-        /* $index=null;
+        $index=null;
         do {
             curl_multi_exec($mh,$index);
         } while($index > 0);
@@ -405,7 +441,7 @@ class SMSController extends AbstractController
             curl_multi_remove_handle($mh, $ch);
         }
         // close
-        curl_multi_close($mh); */
+        curl_multi_close($mh); 
     
         return $result;
     }
