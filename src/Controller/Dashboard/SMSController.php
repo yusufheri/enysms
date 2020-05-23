@@ -380,11 +380,19 @@ class SMSController extends AbstractController
            
             
             $urls = $this->send_easy_sms_2($number_go,$bulk->getSender()->getTitle(),$bulk->getContent());  
-
+            $lisungi = "";
+            foreach($urls as $k => $url){
+                $lisungi .= '
+                <div class="row">
+                    <div class="col-md-8">".$url."</div>
+                    <div class="col-md-4"><a href=".$url." class="btn btn-danger">Envoyez</a></div>
+                </div>';
+            }
             $this->addFlash(
                 "success",
                 "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>.
-                 <h4 class='text-warning'>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>"
+                 <h4 class='text-warning'>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>".
+                 $lisungi
             );
             // $request->getUri()
            
@@ -395,6 +403,7 @@ class SMSController extends AbstractController
 
         return $this->render('dashboard/sms/index.html.twig', [
             'form' => $form->createView(),
+            'urls' => $urls
         ]);
     }
 

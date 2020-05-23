@@ -12,55 +12,55 @@
         <div class="row">
             {% include "dashboard/partials/menu.html.twig" %}
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">  
-                                      
-                    <div class="container">
-                        <div class="row-md px-5">
-                            {% for label, messages in app.flashes %}
-                                <div class="container mt-3">
-                                    <div class="alert alert-dismissible alert-success">
-                                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                        {% for message in messages %}
-                                            <p>{{ message | raw }}</p>
-                                        {% endfor %}
-                                    </div>
+                {% if urls is defined %}
+                    {% include "dashboard/sms/modal.html.twig" with {'urls': urls} %}
+                {% endif %}
+                <div class="container">
+                    <div class="row-md px-5">
+                        {% for label, messages in app.flashes %}
+                            <div class="container mt-3">
+                                <div class="alert alert-dismissible alert-success">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    {% for message in messages %}
+                                        <p>{{ message | raw }}</p>
+                                    {% endfor %}
                                 </div>
-                            {% endfor %}
+                            </div>
+                        {% endfor %}
 
-                       
+                    
 
-                            <h2 class="my-3">Bulk SMS </h2>
-                            <hr>
-                            <div class="alert alert-light">
+                        <h2 class="my-3">Bulk SMS </h2>
+                        <hr>
+                        <div class="alert alert-light">
+                            
+                            {{ form_start(form) }}  
+
+                            <div class="row">
+                                <div class="col-md">{{form_row(form.groupes)}}</div>
+                                <div class="col-md">{{form_row(form.sender)}}</div>
+                            </div>                          
+
+                            {{ form_widget(form) }}
+                                        
                                 
-                                {{ form_start(form) }}  
-
-                                <div class="row">
-                                    <div class="col-md">{{form_row(form.groupes)}}</div>
-                                    <div class="col-md">{{form_row(form.sender)}}</div>
-                                </div>                          
-
-                                {{ form_widget(form) }}
-                                         
-                                    
-                                <div class="alert alert-primary clearfix my-5">
-                                    <h2 class="alert-heading">Sauvegarder les informations</h2>
-                                    <p>Vous êtes sur le point d'envoyer un bulk SMS.</p>
-                                    <button type="submit" class="btn btn-success float-right" onclick="confirm('Confirmez-vous cette opération ? ')">
-                                        <i class="fas fa-check"></i>
-                                        Envoyez 
-                                    </button>
-                                </div>
-                                {{ form_end(form) }}
-                            </div>                            
-                        </div>
-                    </div> 
+                            <div class="alert alert-primary clearfix my-5">
+                                <h2 class="alert-heading">Sauvegarder les informations</h2>
+                                <p>Vous êtes sur le point d'envoyer un bulk SMS.</p>
+                                <button type="submit" class="btn btn-success float-right" onclick="confirm('Confirmez-vous cette opération ? ')">
+                                    <i class="fas fa-check"></i>
+                                    Envoyez 
+                                </button>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>                            
+                    </div>
+                </div> 
             </main>
         </div>
         
     </div>
-    {% if urls is defined %}
-        {% include "dashboard/sms/modal.html.twig" with {'urls': urls} %}
-    {% endif %}
+   
     
     
 {% endblock %}
