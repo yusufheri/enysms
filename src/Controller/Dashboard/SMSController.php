@@ -421,18 +421,20 @@ class SMSController extends AbstractController
             curl_setopt($multiCurl[$i], CURLOPT_SSL_VERIFYPEER,false);
             curl_setopt($multiCurl[$i], CURLOPT_RETURNTRANSFER,true);
             curl_setopt($multiCurl[$i], CURLOPT_SSL_VERIFYHOST, 2);
+            curl_setopt($multiCurl[$i], CURLOPT_TIMEOUT_MS, 200);
             
             //  curl_setopt($multiCurl[$i], CURLOPT_HEADER,false);
             //  curl_setopt($multiCurl[$i], CURLOPT_RETURNTRANSFER,true);
 
             curl_multi_add_handle($mh, $multiCurl[$i]); 
-            dump($fetchURL);
+           
         }  
         // die();
         
         $index=null;
         do {
             curl_multi_exec($mh,$index);
+            dump($index);
         } while($index > 0);
 
         // get content and remove handles
