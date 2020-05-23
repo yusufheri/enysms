@@ -410,7 +410,7 @@ class SMSController extends AbstractController
             if(!empty($numbers)){ $number_go->add($numbers) ;}
            
             
-            $this->send_easy_sms($number_go,$bulk->getSender()->getTitle(),$bulk->getContent());  
+            $this->send_easy_sms_2($number_go,$bulk->getSender()->getTitle(),$bulk->getContent());  
 
             $this->addFlash(
                 "success",
