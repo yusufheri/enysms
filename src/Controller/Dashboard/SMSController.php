@@ -242,83 +242,52 @@ class SMSController extends AbstractController
             $errorPhonesNumbers = 0;
 
             $tabSuccess = [
-                "243829186909",
-                "243810810985",
-                "243857773377",
-                "243816218891",
-                "243848442999",
-                "243823497111",
-                "243998656447",
-                "243813783245",
-                "243899919176",
-                "243852883036",
-                "243817121281",
-                "243999944901",
-                "243810229565",
-                "243829303499",
-                "243990903101",
-                "243812222712",
-                "243998384483",
-                "243810229566",
-                "243821211411",
-                "243990900444",
-                "243813819050",
-                "243822131366",
-                "243970013270",
-                "243829056441",
-                "243992905740",
-                "243819849861",
-                "243815003013",
-                "243819977771",
-                "243818565571",
-                "243997544950",
-                "243821996876",
-                "243977345446",
-                "243810048812",
-                "243811598152",
-                "243814093998",
-                "243971303675",
-                "243817408190",
-                "243819601527",
-                "243971205016",
-                "243811609505",
-                "243810204000",
-                "243990929588",
-                "243816033194",
-                "243853439260",
-                "243810331127",
-                "243998468398",
-                "243998510007",
-                "243824851593",
-                "243813604896",
-                "243818225974",
-                "243814559118",
-                "243816968511",
-                "243999903108",
-                "243816853830",
-                "243844112133",
-                "243997800703",
-                "243817576908",
-                "243858268616",
-                "243815191642",
-                "243992492654",
-                "243812570547",
-                "243999939259",
-                "243812222889",
-                "243998677832",
-                "243819311174",
-                "243991177771",
-                "243810252428",
-                "243998623919",
-                "243895430133",
-                "243817800068",
-                "243999393899",
-                "243814037080",
-                "243997016435",
-                "243995768001",
-                "243998289145",
-                "243990903892",
-                "243817006972"
+                "243823445702",
+                "243978356874",
+                "243112176288",
+                "243811700037",
+                "243815145304",
+                "243998360650",
+                "243826656665",
+                "243819722300",
+                "243813437942",
+                "243842541459",
+                "243819213377",
+                "243999189512",
+                "243816401562",
+                "243816663848",
+                "243896778629",
+                "243814526011",
+                "243810078561",
+                "243840881759",
+                "243815858017",
+                "243816166625",
+                "243818030572",
+                "243810001479",
+                "243810579211",
+                "243992579539",
+                "243999938030",
+                "243810531453",
+                "243977730984",
+                "243991858713",
+                "243995474826",
+                "243810362173",
+                "243820667417",
+                "243825001125",
+                "243997320192",
+                "243819732019",
+                "243998119444",
+                "243978450500",
+                "243851384581",
+                "243814752265",
+                "243814670698",
+                "243817835634",
+                "243852914028",
+                "243894492083",
+                "243821798100",
+                "243973378311",
+                "243825001199",
+                "243822114402"            
             ];
 
             foreach($bulk->getGroupes() as $k => $groupes){
@@ -329,7 +298,7 @@ class SMSController extends AbstractController
                         $number_phone =$this->format_number_success($person->getPhoneMain());
 
                         if(is_numeric($number_phone)){
-                            if (! in_array($number_phone, $tabSuccess)){
+                            if ( in_array($number_phone, $tabSuccess)){
                                 $counter ++;
                                 $phones [] = $number_phone;
                             
@@ -355,7 +324,7 @@ class SMSController extends AbstractController
                         if(!empty($person->getPhone())){
                             $number_phone2 =$this->format_number_success($person->getPhone());
                             if(is_numeric($number_phone2)){
-                                if (! in_array($number_phone2, $tabSuccess)){
+                                if ( in_array($number_phone2, $tabSuccess)){
                                     $counter ++;
                             
                                     $phones [] = $number_phone2;
@@ -410,15 +379,19 @@ class SMSController extends AbstractController
             if(!empty($numbers)){ $number_go->add($numbers) ;}
            
             
-            $this->send_easy_sms_2($number_go,$bulk->getSender()->getTitle(),$bulk->getContent());  
+            $urls = $this->send_easy_sms_2($number_go,$bulk->getSender()->getTitle(),$bulk->getContent());  
 
             $this->addFlash(
                 "success",
                 "<h3>Le bulk SMS s'est términé. (".$success."/".$counter.") messages envoyés avec succès </h3>.
                  <h4 class='text-warning'>".$errorPhonesNumbers." numéros de téléphone sont incorrects</h4>"
             );
-
-            return $this->redirect($request->getUri());
+            // $request->getUri()
+            dump($urls);
+            die();
+            return $this->redirectToRoute("dashboard_bulk_index", [
+                'urls' => $urls
+            ]);
         }
 
         return $this->render('dashboard/sms/index.html.twig', [
@@ -495,33 +468,17 @@ class SMSController extends AbstractController
 
         $username = "yusuyher2020";
         $password = "esm38240";
-
-        // array of curl handles
-        $multiCurl = array();
-        // data to be returned
-        $result = array();
-        // multi handle
-        $mh = curl_multi_init();
+        
+        $urls = new ArrayCollection();
 
         foreach ($number_go as $i => $to) {
 
-            $fetchURL =  "https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=$username&password=$password&from=$from&to=$to&text=".urlencode($message)."&type=$type";         
-           /*  $multiCurl[$i] = curl_init();
-
-            curl_setopt($multiCurl[$i], CURLOPT_URL,$fetchURL);
-            curl_setopt($multiCurl[$i], CURLOPT_SSL_VERIFYPEER,false);
-            curl_setopt($multiCurl[$i], CURLOPT_RETURNTRANSFER,true);
-            curl_setopt($multiCurl[$i], CURLOPT_SSL_VERIFYHOST, 2);
-            curl_setopt($multiCurl[$i], CURLOPT_TIMEOUT_MS, 200); */
-            
-            //  curl_setopt($multiCurl[$i], CURLOPT_HEADER,false);
-            //  curl_setopt($multiCurl[$i], CURLOPT_RETURNTRANSFER,true);
-
-            //curl_multi_add_handle($mh, $multiCurl[$i]); 
-           dump($fetchURL);
-        }  
-        die();
+            $fetchURL =  "https://www.easysendsms.com/sms/bulksms-api/bulksms-api?from=$from&to=$to&text=".urlencode($message)."&username=$username&password=$password&type=$type";         
+           
+            $urls->add($fetchURL);
+        }        
         
+        return $urls;
     }
 
     /**

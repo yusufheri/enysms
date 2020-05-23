@@ -25,6 +25,18 @@
                                     </div>
                                 </div>
                             {% endfor %}
+
+                        {% if urls is defined %}
+                            {% set i = 0 %}
+                            {% for url in urls %}
+                                {% set i = i+1 %}
+                                <div class="row" id="url_{{i}}">
+                                    <div class="col-md-8"><input type="url" name="" id="" value=""></div>
+                                    <div class="col-md-4"><a href="{{ url }}" class="btn btn-danger">Envoyez</a></div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
                             <h2 class="my-3">Bulk SMS </h2>
                             <hr>
                             <div class="alert alert-light">
