@@ -544,14 +544,14 @@ class SMSController extends AbstractController
             $counter = 0;
             for ($i= 0; $i < count($phones); $i++){
                 if (!in_array($phones[$i], $successSent)){
-                    // $this->send_sms($phones[$i],$bulk->getSender()->getTitle(),$message);
+                    //$this->send_sms($phones[$i],$bulk->getSender()->getTitle(),$message);
                     $counter ++;
-                    dump($phones[$i]);
+                    //dump($phones[$i]);
                 }
                 
             }
 
-            dump($counter);
+            dump($counter. " nombre des messages envoyés avec succès. ".$errorPhonesNumbers." numéros de téléphone incorrects");
             die();
 
             $this->addFlash(
@@ -561,7 +561,7 @@ class SMSController extends AbstractController
             );
             // $request->getUri()
            
-            return $this->redirectToRoute("dashboard_bulk_index");
+            return $this->redirect("dashboard_bulk_index");
         }
 
         return $this->render('dashboard/sms/index.html.twig', [
