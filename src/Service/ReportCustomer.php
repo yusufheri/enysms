@@ -149,7 +149,7 @@ class ReportCustomer{
 
        
         $data =  $this->manager->createQuery(
-            'SELECT COUNT(m) as note, m.sentAt as day FROM App\Entity\Message m
+            'SELECT (f.segment * COUNT(m)) as note, m.sentAt as day FROM App\Entity\Message m
              JOIN m.favorite f
              WHERE (f.user = :user) AND (m.status IS NOT NULL) AND (m.sentAt BETWEEN :monday AND :sunday) 
              GROUP BY m.sentAt
@@ -176,7 +176,7 @@ class ReportCustomer{
 
        
         $data =  $this->manager->createQuery(
-            'SELECT COUNT(m) AS note, m.sentAt AS day, m.state AS etat FROM App\Entity\Message m
+            'SELECT (f.segment * COUNT(m)) AS note, m.sentAt AS day, m.state AS etat FROM App\Entity\Message m
              JOIN m.favorite f
              WHERE (m.sentAt BETWEEN :firstday AND :lastday)  AND (f.user = :user)
              GROUP BY m.sentAt, m.state
@@ -196,7 +196,7 @@ class ReportCustomer{
        
         $data =  $this->manager->createQuery(
             "SELECT  
-            (SELECT COUNT(m1) as note FROM App\Entity\Message m1 JOIN m.favorite f WHERE  m1.status IS NOT NULL) AS success,
+            (SELECT (f.segment * COUNT(m1)) as note FROM App\Entity\Message m1 JOIN m.favorite f WHERE  m1.status IS NOT NULL) AS success,
             (SELECT COUNT(m2) as note FROM App\Entity\Message m2 WHERE m2.status IS  NULL) AS Error,
              m.sentAt as day 
             FROM App\Entity\Message m
@@ -221,7 +221,7 @@ class ReportCustomer{
     public function getTotalUsedDaily(user $user)
     {
         return $this->manager->createQuery(
-            "SELECT COUNT(m) FROM App\Entity\Message m 
+            "SELECT (f.segment * COUNT(m)) FROM App\Entity\Message m 
             JOIN m.favorite f
             WHERE  (m.status IS NOT NULL) AND (f.user = :user) AND (m.sentAt = :day)"
         )
@@ -238,7 +238,7 @@ class ReportCustomer{
     public function getTotalUsed(user $user)
     {
         return $this->manager->createQuery(
-            "SELECT COUNT(m) FROM App\Entity\Message m 
+            "SELECT (f.segment * COUNT(m)) FROM App\Entity\Message m 
             JOIN m.favorite f
             WHERE  (m.status IS NOT NULL) AND (f.user = :user) " 
         )
