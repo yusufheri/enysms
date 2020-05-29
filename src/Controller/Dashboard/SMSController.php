@@ -160,7 +160,7 @@ class SMSController extends AbstractController
                 $this->addFlash("danger","Le SMS n'est pas envoyé au destinataire, prière de vérifier votre connexion");
             }
            
-            //  $manager->flush();
+            
             return $this->redirect($request->getUri());
         }
 
@@ -627,14 +627,15 @@ class SMSController extends AbstractController
         return $urls;
     }
 
-    function send_sms($to, $form, $message){
+    function send_sms($to, $from, $message){
         $ID = 'AC1d0fcb1876b51d7c2330423969e238b2';
-        $token = 'b01c1e2d870106352bee9437af318940';
+        //$token = 'b01c1e2d870106352bee9437af318940';
+        $token = 'e14a17a121a7ae1b8aacc39c4caf8fba';
         $url = "https://api.twilio.com/2010-04-01/Accounts/AC1d0fcb1876b51d7c2330423969e238b2/Messages.json";
     
-        $form = str_replace("_"," ",$form);
+        $from = str_replace("_"," ",$from);
         $data = array (
-            'From' => $form,
+            'From' => $from,
             'To' => $to,
             'MessagingServiceSid' => 'MGde55b0c91c515d9a80917784c12a5032',
             'Body' => $message,
