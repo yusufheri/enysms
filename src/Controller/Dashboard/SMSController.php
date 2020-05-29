@@ -2,6 +2,7 @@
 
 namespace App\Controller\Dashboard;
 
+use Osms\Osms;
 use App\Entity\Group;
 use App\Entity\Person;
 use App\Entity\Sender;
@@ -14,10 +15,10 @@ use App\Service\ReportCustomer;
 use App\Repository\GroupRepository;
 use App\Repository\PersonRepository;
 use App\Repository\SenderRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -125,12 +126,17 @@ class SMSController extends AbstractController
                 $number_go = new ArrayCollection();
                 $number_go->add($phone);
 
-                $status = $this->send_easy_sms($number_go, $single->getSender()->getTitle(), $single->getContent());
-                // dump("Status : " . $status[0]);
-                //  die();
+                //  $status = $this->send_easy_sms($number_go, $single->getSender()->getTitle(), $single->getContent());
+                //$status = $this->send_sms_orange($single->getSender()->getTitle(), $number_go->first(), $single->getContent());
+                //dump($status);
+                //die();
+                $message  = $this->messageTwilio($single->getContent());
+                $this->send_sms($number_go->first(), $single->getSender()->getTitle(),$message);
+                //dump($status);
+                //die();
 
                 $bool = true; 
-                $status_string = $status[0];
+                $status_string = "1";
 
                 if (strlen($status_string) < 60)
                 {   $state = 1;    } 
@@ -300,7 +306,157 @@ class SMSController extends AbstractController
                    
                 }              
             }
-            $manager->flush();
+            //$manager->flush();
+             
+            $message  = $this->messageTwilio($bulk->getContent());
+            
+            $counter = 0;
+            for ($i= 0; $i < count($phones); $i++){
+                $this->send_sms($phones[$i],$bulk->getSender()->getTitle(),$message);
+                $counter ++;
+                dump($phones[$i]);
+            }
+
+            dump($counter);
+            die();
+
+            $this->addFlash(
+                "success",
+                '<h4>Le bulk SMS s est términé. ('.$success.'/'.$counter.') + '.$errorPhonesNumbers.' numéros de téléphone incorrects</h4>
+                 '
+            );
+            // $request->getUri()
+           
+            return $this->redirectToRoute("dashboard_bulk_index");
+        }
+
+        return $this->render('dashboard/sms/index.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /* public function bulkSMS(Request $request, EntityManagerInterface $manager, PersonRepository $personRepository)
+    {
+        $bulk = new Favorite();
+
+        //  $form = $this->createForm(BulkType::class, $bulk);
+
+        $form = $this->createFormBuilder($bulk)
+                        ->add('groupes', EntityType::class,[
+                            'label' => "Groupe ",
+                            'attr'  => [
+                                'placeholder' => "Selectionnez le groupe ou catégorie de la personne",
+                            ],
+                            'class' => Group::class,
+                            'query_builder' => function(GroupRepository $groupRepository){
+                                return $groupRepository->createQueryBuilder('g')
+                                            ->where("g.deletedAt IS NULL")
+                                            ->andWhere("g.user = :user")
+                                            ->orderBy("g.title", "ASC")
+                                            ->setParameter("user", $this->getUser());
+                            },
+                            'choice_label' => 'title',
+                            'multiple' => true
+                        ])
+                        ->add('sender', EntityType::class,[
+                            'label' => "Sender ",
+                            'attr'  => [
+                                'placeholder' => "Selectionnez le Sender",
+                            ],
+                            'class' => Sender::class,
+                            'query_builder' => function(SenderRepository $senderRepository){
+                                return $senderRepository->createQueryBuilder('s')
+                                                        ->where("s.deletedAt IS NULL")
+                                                        ->andWhere("s.user = :user")
+                                                        ->orderBy("s.title", "ASC")
+                                                        ->setParameter("user",$this->getUser())
+                                                        ;
+                            },
+                            'choice_label' => 'title'
+                        ])
+                        ->add('content', TextareaType::class,[
+                            'label' => "Votre message ",
+                            'attr'  => [
+                                'placeholder' => "Saisir un commentaire si possible",
+                            ],
+                        ])->getForm();
+       
+
+        $user = $this->getUser();
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            
+            $bulk->setUser($user);
+            $manager->persist($bulk);
+            
+           
+            $success = 0;$counter = 0;
+
+            $phones = [];
+            $errorPhonesNumbers = 0;
+
+            $tabSuccess = [];
+
+            foreach($bulk->getGroupes() as $k => $groupes){
+                foreach($groupes->getPeople() as $l => $person){
+
+                    // Premier numéro
+                    if(!empty($person->getPhoneMain())){
+                        $number_phone =$this->format_number_success($person->getPhoneMain());
+
+                        if(is_numeric($number_phone)){
+                            //if ( in_array($number_phone, $tabSuccess)){
+                                $counter ++;
+                                $phones [] = $number_phone;
+                            
+
+                                $success ++; $state = 1;$status= "OK";
+                                $message = new Message();
+                                $message->setFavorite($bulk)
+                                        ->setPerson($person)
+                                        ->setState($state)
+                                        ->setStatus($status);
+                    
+                                $manager->persist($message);
+                            //}
+                            
+                        } else {
+                            $errorPhonesNumbers ++;
+                        }
+                        
+                    }
+                    
+                    // Deuxième numéro
+                    if(!is_null($person->getPhone())){
+                        if(!empty($person->getPhone())){
+                            $number_phone2 =$this->format_number_success($person->getPhone());
+                            if(is_numeric($number_phone2)){
+                                //if ( in_array($number_phone2, $tabSuccess)){
+                                    $counter ++;
+                            
+                                    $phones [] = $number_phone2;
+                                    
+                                    $success ++; $state = 1;
+                                    $message = new Message();
+                                    $message->setFavorite($bulk)
+                                            ->setPerson($person)
+                                            ->setState($state)
+                                            ->setStatus($status);
+                        
+                                    $manager->persist($message);
+                                //}
+                                
+                            } else {
+                                $errorPhonesNumbers ++;
+                            }
+                        }
+                    }
+                   
+                }              
+            }
+            //$manager->flush();
             //}
             $k = 1; $number_go = []; $aide= 50;$numbers=""; $lisungi = 1;
             //dump(count($phones));
@@ -357,6 +513,34 @@ class SMSController extends AbstractController
         return $this->render('dashboard/sms/index.html.twig', [
             'form' => $form->createView(),
         ]);
+    } */
+
+    function send_sms_orange($sender, $to, $message){
+
+        $config = array(
+            'clientId' => 'h7LivuCMDCQWNVcSh0ywmUpdGosJ7sM3',
+            'clientSecret' => 'B2AAr5oISc5L4d9b'
+        );
+        
+        $osms = new Osms($config);
+        $osms->setVerifyPeerSSL(false);
+        
+        // retrieve an access token
+        $response = $osms->getTokenFromConsumerKey();
+        dump($response);
+
+        if (!empty($response['access_token'])) {
+            $senderAddress = 'tel:+243892751408';
+            $receiverAddress = 'tel:+'.$to;
+            $message = $message;
+            $senderName = $sender;
+            //dump($sender);
+            return $osms->sendSMS($senderAddress, $receiverAddress, $message, $senderName);
+        } else {
+           return "error";
+        }
+ 
+       
     }
 
     function send_easy_sms_single($to, $from, $message, $type=1){
@@ -405,7 +589,8 @@ class SMSController extends AbstractController
             curl_multi_add_handle($mh, $multiCurl[$i]); 
            
         }  
-        // die();
+        dump($fetchURL);
+        //die();
         
         $index=null;
         do {
@@ -420,7 +605,8 @@ class SMSController extends AbstractController
         //die();
         // close
         curl_multi_close($mh); 
-    
+        //dump($result);
+        //die();
         return $result;
     }
 
@@ -439,6 +625,46 @@ class SMSController extends AbstractController
         }        
         
         return $urls;
+    }
+
+    function send_sms($to, $form, $message){
+        $ID = 'AC1d0fcb1876b51d7c2330423969e238b2';
+        $token = 'b01c1e2d870106352bee9437af318940';
+        $url = "https://api.twilio.com/2010-04-01/Accounts/AC1d0fcb1876b51d7c2330423969e238b2/Messages.json";
+    
+        $form = str_replace("_"," ",$form);
+        $data = array (
+            'From' => $form,
+            'To' => $to,
+            'MessagingServiceSid' => 'MGde55b0c91c515d9a80917784c12a5032',
+            'Body' => $message,
+        );
+       
+        //--data-urlencode 'To=+243892751408' \
+        //--data-urlencode 'From=+12565983933' \
+        $post = http_build_query($data);
+        $x = curl_init($url );
+        curl_setopt($x, CURLOPT_POST, true);
+        curl_setopt($x, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($x, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($x, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($x, CURLOPT_USERPWD, "$ID:$token");
+        curl_setopt($x, CURLOPT_POSTFIELDS, $post);
+        $y = curl_exec($x);
+        curl_close($x);
+        return $y;
+    }
+
+    function messageTwilio($message){
+        $message = str_replace("é","e", $message);
+        $message = str_replace("è","e", $message);
+        $message = str_replace("ê","e", $message);
+        $message = str_replace("à","a", $message);
+        $message = str_replace("â","a", $message);
+        $message = str_replace("û","u", $message);
+        $message = str_replace("ù","u", $message);
+
+        return $message;
     }
 
     /**

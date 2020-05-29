@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=FavoriteRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Favorite
 {
@@ -66,11 +67,26 @@ class Favorite
      */
     private $deletedAt;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $segment;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->groupes = new ArrayCollection();
+    }
+
+    /**
+     * @ORM\PrePersist
+     *
+     * @return void
+     */
+    public function addSegment() {
+        
+        $this->segment =(int) (1+ strlen($this->content)/50);   
     }
 
     public function countMessages(){
@@ -223,6 +239,18 @@ class Favorite
     public function setDeletedAt(?\DateTimeInterface $deletedAt): self
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    public function getSegment(): ?int
+    {
+        return $this->segment;
+    }
+
+    public function setSegment(int $segment): self
+    {
+        $this->segment = $segment;
 
         return $this;
     }
