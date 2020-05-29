@@ -550,9 +550,9 @@ $successSent = [
             $counter2 = 0;
             for ($i= 0; $i < count($phones); $i++){
                 if (!in_array($phones[$i], $successSent)){
-                    //$this->send_sms($phones[$i],$bulk->getSender()->getTitle(),$message);
+                    $this->send_sms($phones[$i],$bulk->getSender()->getTitle(),$message);
                     $counter2 ++;
-                    dump($phones[$i]);
+                    //dump($phones[$i]);
                 }
                 
             }
