@@ -279,7 +279,7 @@ class SMSController extends AbstractController
                     }
                     
                     // Deuxième numéro
-                    if(!is_null($person->getPhone())){
+                    /* if(!is_null($person->getPhone())){
                         if(!empty($person->getPhone())){
                             $number_phone2 =$this->format_number_success($person->getPhone());
                             if(is_numeric($number_phone2)){
@@ -302,7 +302,7 @@ class SMSController extends AbstractController
                                 $errorPhonesNumbers ++;
                             }
                         }
-                    }
+                    } */
                    
                 }              
             }
