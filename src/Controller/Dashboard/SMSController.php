@@ -625,9 +625,8 @@ class SMSController extends AbstractController
     }
 
     function send_sms($to, $from, $message){
-        $ID = 'AC1d0fcb1876b51d7c2330423969e238b2';
-        //$token = 'b01c1e2d870106352bee9437af318940';
-        $token = 'e14a17a121a7ae1b8aacc39c4caf8fba';
+        $ID = $_ENV["TWILIO_ACCOUNT_ID"];
+        $token = $_ENV["TWILIO_AUTH_TOKEN"];
         $url = "https://api.twilio.com/2010-04-01/Accounts/AC1d0fcb1876b51d7c2330423969e238b2/Messages.json";
     
         $from = str_replace("_"," ",$from);
