@@ -130,7 +130,8 @@ class SMSController extends AbstractController
                 //$status = $this->send_sms_orange($single->getSender()->getTitle(), $number_go->first(), $single->getContent());
                 //dump($status);
                 //die();
-                $message  = $this->messageTwilio($single->getContent());
+                //$message  = $this->messageTwilio($single->getContent());
+                $message = $single->getContent();
                 $this->send_sms($number_go->first(), $single->getSender()->getTitle(),$message);
                 //dump($status);
                 //die();
@@ -303,7 +304,8 @@ class SMSController extends AbstractController
             }
             $manager->flush();
              
-            $message  = $this->messageTwilio($bulk->getContent());
+            //$message  = $this->messageTwilio($bulk->getContent());
+            $message = $bulk->getContent();
             
             $counter2 = 0;
             for ($i= 0; $i < count($phones); $i++){
