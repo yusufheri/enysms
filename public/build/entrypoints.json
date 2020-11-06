@@ -2,29 +2,36 @@
   "entrypoints": {
     "js/app": {
       "js": [
-        "/build/runtime.518d4a5c.js",
-        "/build/0.f0534ac6.js",
-        "/build/1.d4116b8e.js",
-        "/build/js/app.d83db435.js"
+        "/build/runtime.d94b3b43.js",
+        "/build/0.c8315310.js",
+        "/build/1.0fb654b3.js",
+        "/build/js/app.111f0caf.js"
+      ]
+    },
+    "js/typed": {
+      "js": [
+        "/build/runtime.d94b3b43.js",
+        "/build/2.93e13efa.js",
+        "/build/js/typed.bb862743.js"
       ]
     },
     "js/dashboard": {
       "js": [
-        "/build/runtime.518d4a5c.js",
-        "/build/0.f0534ac6.js",
-        "/build/js/dashboard.ddbdd66f.js"
+        "/build/runtime.d94b3b43.js",
+        "/build/0.c8315310.js",
+        "/build/js/dashboard.ce2b7e3e.js"
       ]
     },
     "js/utils": {
       "js": [
-        "/build/runtime.518d4a5c.js",
-        "/build/0.f0534ac6.js",
-        "/build/js/utils.600965f2.js"
+        "/build/runtime.d94b3b43.js",
+        "/build/0.c8315310.js",
+        "/build/js/utils.ed3f7d17.js"
       ]
     },
     "css/app": {
       "js": [
-        "/build/runtime.518d4a5c.js"
+        "/build/runtime.d94b3b43.js"
       ],
       "css": [
         "/build/css/app.8f5ae327.css"
@@ -32,7 +39,7 @@
     },
     "css/dashboard": {
       "js": [
-        "/build/runtime.518d4a5c.js"
+        "/build/runtime.d94b3b43.js"
       ],
       "css": [
         "/build/css/dashboard.100f093d.css"

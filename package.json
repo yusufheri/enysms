@@ -1,11 +1,11 @@
 {
     "devDependencies": {
-        "@symfony/webpack-encore": "^0.30.0",
+        "@symfony/webpack-encore": "^0.31.0",
         "bootstrap": "^4.5.0",
         "core-js": "^3.0.0",
         "jquery": "^3.5.1",
-        "number-to-words": "^1.2.4",
         "node-sass": "^4.14.1",
+        "number-to-words": "^1.2.4",
         "popper.js": "^1.16.1",
         "regenerator-runtime": "^0.13.2",
         "sass-loader": "^8.0.2",
@@ -20,6 +20,8 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "twilio": "^3.44.0"
+        "twilio": "^3.44.0",
+        "type.js": "0.0.1",
+        "typed.js": "^2.0.11"
     }
 }
