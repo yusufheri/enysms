@@ -2,15 +2,18 @@
 
 namespace App\Entity;
 
-use App\Repository\FavoriteRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\FavoriteRepository;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\HttpFoundation\File\File;
+use Doctrine\Common\Collections\ArrayCollection;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=FavoriteRepository::class)
  * @ORM\HasLifecycleCallbacks()
+ * @Vich\Uploadable
  */
 class Favorite
 {
@@ -72,11 +75,38 @@ class Favorite
      */
     private $segment;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $media;
+
+    /**
+     * @Vich\UploadableField(mapping="whatsapp_media", fileNameProperty="media")
+     * @var File
+     */
+    private $imageFile;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $whatsapp;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="favorite")
+     */
+    private $medias;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
         $this->createdAt = new \DateTime();
         $this->groupes = new ArrayCollection();
+        $this->medias = new ArrayCollection();
     }
 
     /**
@@ -251,6 +281,90 @@ class Favorite
     public function setSegment(int $segment): self
     {
         $this->segment = $segment;
+
+        return $this;
+    }
+
+    public function getMedia(): ?string
+    {
+        return $this->media;
+    }
+
+    public function setMedia(?string $media): self
+    {
+        $this->media = $media;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getWhatsapp(): ?bool
+    {
+        return $this->whatsapp;
+    }
+
+    public function setWhatsapp(?bool $whatsapp): self
+    {
+        $this->whatsapp = $whatsapp;
+
+        return $this;
+    }
+
+    public function setImageFile(File $image = null)
+    {
+        $this->imageFile = $image;
+
+        // VERY IMPORTANT:
+        // It is required that at least one field changes if you are using Doctrine,
+        // otherwise the event listeners won't be called and the file is lost
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
+
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    /**
+     * @return Collection|Media[]
+     */
+    public function getMedias(): Collection
+    {
+        return $this->medias;
+    }
+
+    public function addMedia(Media $media): self
+    {
+        if (!$this->medias->contains($media)) {
+            $this->medias[] = $media;
+            $media->setFavorite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(Media $media): self
+    {
+        if ($this->medias->removeElement($media)) {
+            // set the owning side to null (unless already changed)
+            if ($media->getFavorite() === $this) {
+                $media->setFavorite(null);
+            }
+        }
 
         return $this;
     }

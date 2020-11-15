@@ -263,7 +263,12 @@ class User implements UserInterface
 
     public function getTotalBalance()
     {
-        return $this->balances->last()->getCumul();
+        $balances = $this->balances;
+       if ($balances->count() > 0) {
+           return $balances->last()->getCumul();
+       } 
+       return 0;
+        
     }
 
     public function getSentSMS(){

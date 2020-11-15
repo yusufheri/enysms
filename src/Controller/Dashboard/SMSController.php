@@ -20,12 +20,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SMSController extends AbstractController
 {
+    public function testSMS()
+    {
 
+    }
     /**
      * Afficher le rapport synthese de SMS
      * 
@@ -39,6 +43,167 @@ class SMSController extends AbstractController
 
         return $this->render("dashboard/sms/report.html.twig",[
             'stats' => $reportCustomer
+        ]);
+    }
+
+    /**
+     * @Route("/dashboard/whatsapp", name="dashboard_whatsapp")
+     */
+    public function whatsApp(Request $request, EntityManagerInterface $manager, 
+    PersonRepository $personRepository, SenderRepository $sender)
+    {
+        $whatsapp = new Favorite();
+
+        $form = $this->createFormBuilder($whatsapp)
+                        ->add('groupes', EntityType::class,[
+                            'label' => "Groupe des membres",
+                            'attr'  => [
+                                'placeholder' => "Sélectionnez le groupe ou catégorie de la personne",
+                            ],
+                            'class' => Group::class,
+                            'query_builder' => function(GroupRepository $groupRepository){
+                                return $groupRepository->createQueryBuilder('g')
+                                            ->where("g.deletedAt IS NULL")
+                                            ->andWhere("g.user = :user")
+                                            ->orderBy("g.title", "ASC")
+                                            ->setParameter("user", $this->getUser());
+                            },
+                            'choice_label' => 'title',
+                            'multiple' => true
+                        ])
+                        ->add('content', TextareaType::class,[
+                            'label' => "Votre message WhatsApp ",
+                            'attr'  => [
+                                'placeholder' => "Veuillez taper votre message à envoyer à vos membres via WhatsApp",
+                                'rows' => 7
+                            ],
+                        ])
+                        ->add('imageFile', FileType::class, [
+                            'label' => 'Sélectionnez le fichier à joindre au message (3M maximum)',
+                            'required' => false
+                        ])
+                        ->getForm();
+       
+
+        $user = $this->getUser();
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+           
+            $whatsapp->setUser($user);
+            $whatsapp->setSender($sender->findAll()[0]); // On prend un sender au hasard pour éviter cette exception
+            $manager->persist($whatsapp);
+            
+            
+            $success = 0;$counter = 0;
+
+            $phones = [];
+            $errorPhonesNumbers = 0;
+
+            
+            
+            foreach($whatsapp->getGroupes() as $k => $groupes){
+                foreach($groupes->getPeople() as $l => $person){
+
+                    
+                    $status= "OK";
+                    // Premier numéro
+                    if(!empty($person->getPhoneMain())){
+                        $number_phone = $person->getPhoneMain();
+                        
+                        if(is_numeric($number_phone)){
+                                if(strlen($number_phone) == 12){
+                                    $counter ++;
+                                    $phones [] = $number_phone;
+                                
+
+                                    $success ++; $state = 1;
+                                    $message = new Message();
+                                    $message->setFavorite($whatsapp)
+                                            ->setPerson($person)
+                                            ->setState($state)
+                                            ->setStatus($status);
+                        
+                                    $manager->persist($message);
+                                } else {
+                                    $errorPhonesNumbers ++;
+                                }
+                            
+                        } else {
+                            $errorPhonesNumbers ++;
+                        }
+                        
+                    }
+                    
+                    // Deuxième numéro
+                    if(!is_null($person->getPhone())){
+                        if(!empty($person->getPhone())){
+                            $number_phone2 =$person->getPhone();
+                            if(is_numeric($number_phone2)){
+                                    if(strlen($number_phone2) == 12){
+                                        $counter ++;
+                            
+                                        $phones [] = $number_phone2;
+                                        
+                                        $success ++; $state = 1;
+                                        $message = new Message();
+                                        $message->setFavorite($whatsapp)
+                                                ->setPerson($person)
+                                                ->setState($state)
+                                                ->setStatus($status);
+                            
+                                        $manager->persist($message);
+                                    } else {
+                                        $errorPhonesNumbers ++;
+                                    }
+                                    
+                                //}
+                                
+                            } else {
+                                $errorPhonesNumbers ++;
+                            }
+                        }
+                    } 
+                   
+                }              
+            }
+            
+            $manager->flush();
+            
+            //$message  = $this->messageTwilio($bulk->getContent());
+            $message = $whatsapp->getContent();
+            
+            $counter2 = 0;            
+            
+            for ($i= 0; $i < count($phones); $i++){
+                    if(is_null($whatsapp->getMedia())) {
+                        $this->send_whatsapp_sms("", $phones[$i],$message);
+                    } else {
+                        $this->send_whatsapp_sms_media("", $phones[$i], $message, $whatsapp->getMedia());
+                        //dump($whatsapp->getMedia());
+                    }
+                    
+                    $counter2 ++;
+                
+            }
+
+            dd($counter. " nombre des messages envoyés avec succès (code : ".$counter2.")".$errorPhonesNumbers." numéros de téléphone incorrects");
+            /*die();
+
+            $this->addFlash(
+                "success",
+                '<h4>Le bulk SMS s est términé. ('.$success.'/'.$counter.') + '.$errorPhonesNumbers.' numéros de téléphone incorrects</h4>
+                 '
+            );
+            // $request->getUri()
+            */
+            //return $this->redirect("dashboard_bulk_index");
+           
+        }
+
+        return $this->render('dashboard/sms/whatsapp.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 
@@ -169,6 +334,7 @@ class SMSController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    
     /**
      * @Route("/dashboard/sms/bulk", name="dashboard_bulk_index")
      */
@@ -733,5 +899,60 @@ class SMSController extends AbstractController
             );
         }
         return $this->redirectToRoute('dashboard_person_index');
+    }
+
+    function send_whatsapp_sms_media(String $from = "", String $to = "", String $message ="Bienvenue dans notre service de messagerie", String $media = ""){
+
+        $ID = 'AC420fe974923b547060e2bf2f11db598d';
+        $token = '2c4345c8e4b8a5151c1d0fd541e09e94';
+        //$url = "https://api.twilio.com/2010-04-01/Accounts/AC420fe974923b547060e2bf2f11db598d/Messages.json";
+        if (strpos($to, "+") === false) { $to ="+".$to; }
+        $media = "http://enysms.herokuapp.com/uploads/medias/".$media;
+        $media = "http://www.adiac-congo.com/sites/default/files/dsc_0596_fileminimizer.jpg";
+
+        $data = array (
+            'From' => 'whatsapp:+14155238886',
+            'To' => 'whatsapp:'.$to,
+            'Body' => $message,
+            'MediaUrl' => $media,
+        );
+    
+        $post = http_build_query($data);
+        $x = curl_init($url );
+        curl_setopt($x, CURLOPT_POST, true);
+        curl_setopt($x, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($x, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($x, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($x, CURLOPT_USERPWD, "$ID:$token");
+        curl_setopt($x, CURLOPT_POSTFIELDS, $post);
+        $y = curl_exec($x);
+        curl_close($x);
+        return $y;
+    }
+    
+    function send_whatsapp_sms(String $from = "", $to, String $message ="Bienvenue dans notre service de messagerie"){
+    
+        $ID = 'AC420fe974923b547060e2bf2f11db598d';
+        $token = '2c4345c8e4b8a5151c1d0fd541e09e94';
+        $url = "https://api.twilio.com/2010-04-01/Accounts/AC420fe974923b547060e2bf2f11db598d/Messages.json";
+        if (strpos($to, "+") === false) { $to ="+".$to; }
+        $data = array (
+            'From' => 'whatsapp:+14155238886',
+            'To' => 'whatsapp:'.$to,
+            'Body' => $message,
+        );
+    
+        $post = http_build_query($data);
+        $x = curl_init($url );
+        curl_setopt($x, CURLOPT_POST, true);
+        curl_setopt($x, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($x, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($x, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($x, CURLOPT_USERPWD, "$ID:$token");
+        curl_setopt($x, CURLOPT_POSTFIELDS, $post);
+        $y = curl_exec($x);
+        curl_close($x);
+        $y;
+        return $y;
     }
 }

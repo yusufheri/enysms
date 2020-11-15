@@ -1,0 +1,112 @@
+{% extends 'dashboard/partials/base.html.twig' %}
+
+{% block title %}WhatsApp API::enysms{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('css/dashboard') }}
+{% endblock %}
+
+{% block body %}
+    {% include "dashboard/partials/header.html.twig" %}  
+    <div class="container-fluid">
+        <div class="row">
+            {% include "dashboard/partials/menu.html.twig" %}
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">  
+                
+                <div class="container">
+                    <div class="row-md px-5">
+                        {% for label, messages in app.flashes %}
+                            <div class="container mt-3">
+                                <div class="alert alert-dismissible alert-success">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    {% for message in messages %}
+                                        <p>{{ message | raw }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    
+
+                        <h2 class="my-3">WhatsApp Message </h2>
+                        <hr>
+                        <div class="alert alert-light">
+                            
+                            {{ form_start(form) }}             
+                            {{ form_row(form.groupes) }}
+                            {{ form_row(form.content) }}
+                            <div class="row">
+                            {% set url = "/images/empty.png" %}
+                                <div class="col-md-9">{{ form_row(form.imageFile) }}</div>
+                                <div class="col-md-3"><img src="{{ url }}" alt="" id="preview" class="img-thumbnail" style=" width:100%;"></div>
+                            </div>
+                            {{ form_widget(form) }}
+                                        
+                            <img src="" alt="" id="avatar">
+                            <div class="alert alert-primary clearfix my-5">
+                                <h2 class="alert-heading">Sauvegarder les informations</h2>
+                                <p>Vous êtes sur le point d'envoyer un message WhatsApp à un groupe de vos membres.</p>
+                                <button type="submit" class="btn btn-success float-right" onclick="confirm('Confirmez-vous cette opération ? ')">
+                                    <i class="fas fa-check"></i>
+                                    Envoyez maintenant
+                                </button>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>                            
+                    </div>
+                </div> 
+            </main>
+        </div>
+        
+    </div>
+   
+    
+    
+{% endblock %}
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+    {{ encore_entry_script_tags('js/dashboard') }}   
+    <script>
+    $(document).ready(function(){
+        function previewFile(input, preview){
+            var file = input.files[0];        
+            if(file){                    
+                var reader = new FileReader();        
+                reader.onload = function(){
+                    $(preview).attr("src", reader.result);
+                }        
+                reader.readAsDataURL(file);
+            }
+        }
+
+        $("#form_imageFile").on("change", function(e) {
+                e.preventDefault() 
+
+                $this = $(this);
+                
+                var fsize = $this[0].files[0].size,
+                    ftype = $this[0].files[0].type,
+                    fname = $this[0].files[0].name,
+                    fextension = fname.substring(fname.lastIndexOf('.')+1);
+
+                validExtensions = ["JPG","JPEG","MP4","jpg","jpeg","gif","png", "mp4"];
+
+                
+                if ($.inArray(fextension, validExtensions) == -1){
+                    alert("Ce format de fichier n'est pas pris en charge");
+                    this.value = "";
+                    return false;
+                }else{
+                    if(fsize > 3145728){/*1048576-1MB(You can change the size as you want)*/
+                        alert("File size too large! Please upload less than 3MB");
+                        this.value = "";
+                        return false;
+                    }
+                    previewFile(this, "#preview")
+                }            
+                
+            })
+    })  
+    </script>
+{% endblock %} 

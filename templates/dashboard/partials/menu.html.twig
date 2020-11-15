@@ -9,7 +9,14 @@
                 </a>
             </li>
             
-            
+            <li class="nav-item">
+                <a class="nav-link {% if route_name == 'dashboard_whatsapp_index' or 'dashboard_whatsapp' in route_name %} active {% endif %}" 
+                href="{{ path('dashboard_whatsapp') }}">
+                <i class="fas fa-comment-dots fa-2x"></i>
+                WhatsApp                
+                </a>
+            </li>
+
             <li class="nav-item">
                 <a class="nav-link {% if route_name == 'dashboard_bulk_index' or 'dashboard_bulk' in route_name %} active {% endif %}" 
                 href="{{ path('dashboard_bulk_index') }}">

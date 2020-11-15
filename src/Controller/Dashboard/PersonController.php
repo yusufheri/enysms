@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PersonController extends AbstractController
 {
+    private $sms_message = "Cliquez sur ce lien pour que vous soyez ajouter dans notre base de donnees http://wa.me/+14155238886?text=join%20slightly-grow";
     /**
      * @Route("/dashboard/person/{page<\d+>?1}", name="dashboard_person_index")
      */
@@ -89,7 +90,14 @@ class PersonController extends AbstractController
 
             $person->setUser($user);
 
-            $manager->persist($person);
+            $manager->persist($person);            
+            //dd($user);
+            $pos = strpos( $user->getEmail(), "demo") ;
+            //dd($pos);
+            if ($pos == 0){
+                $this->send_sms($person->getPhoneMain(), $this->sms_message);
+                $this->send_sms($person->getPhone(), $this->sms_message);
+            }
             $manager->flush();
 
             $this->addFlash(
@@ -103,6 +111,41 @@ class PersonController extends AbstractController
         return $this->render('dashboard/person/new.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    function send_sms($to, $message){
+        $ID = $_ENV["TWILIO_ACCOUNT_ID_2"];
+        $token = $_ENV["TWILIO_AUTH_TOKEN_2"];
+        
+        $url = "https://api.twilio.com/2010-04-01/Accounts/".$ID."/Messages.json";
+        
+        
+
+        if(!(is_null($to))){
+            if (!empty($to)){
+                if (strpos($to, "+") === false) { $to ="+".$to; }
+                $data = array(
+                    //'From' => '+12565983933',
+                    'From' => '+16624993646',
+                    'To' => $to,
+                    //'MessagingServiceSid' => 'MGde55b0c91c515d9a80917784c12a5032',
+                    'Body' => $message,
+                );
+                
+                $post = http_build_query($data);
+                $x = curl_init($url );
+                curl_setopt($x, CURLOPT_POST, true);
+                curl_setopt($x, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($x, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($x, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+                curl_setopt($x, CURLOPT_USERPWD, "$ID:$token");
+                curl_setopt($x, CURLOPT_POSTFIELDS, $post);
+                $y = curl_exec($x);
+                curl_close($x);
+                return $y;
+            }
+        }
+        
     }
 
     /**
